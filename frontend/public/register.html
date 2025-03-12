@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>註冊頁面 - Flappy Capy & Cavy</title>
+    <link rel="stylesheet" href="./src/style.css">
+</head>
+<body>
+    <h1>註冊您的帳號</h1>
+
+    <input type="text" id="username" placeholder="請輸入您的IG帳號">
+    <input type="password" id="password" placeholder="請輸入密碼">
+    <input type="password" id="confirm-password" placeholder="請再次輸入密碼">
+
+    <button id="register-btn">確認註冊</button>
+    <button id="cancel-btn">取消</button>
+
+    <script type="module">
+        import { register } from "./auth.js";
+
+        document.getElementById("register-btn").addEventListener("click", () => {
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+            const confirmPassword = document.getElementById("confirm-password").value;
+
+            if (password === confirmPassword) {
+                register(username, password)
+                    .then(() => {
+                        alert("註冊成功");
+                        window.location.href = "/index.html";  // 註冊成功後自動跳轉回首頁
+                    })
+                    .catch(err => alert("註冊失敗：" + err.message));
+            } else {
+                alert("密碼不一致");
+            }
+        });
+
+        document.getElementById("cancel-btn").addEventListener("click", () => {
+            window.location.href = "/index.html";  // 返回首頁
+        });
+    </script>
+</body>
+</html>

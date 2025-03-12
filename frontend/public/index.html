@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flappy Capy & Cavy</title>
+    <link rel="stylesheet" href="./src/style.css">
+</head>
+<body>
+    <div class="FlappyCapyCavy_Game">
+        <div class="container">
+            <div id="navbar">
+                <span id="user-status" class="user-status"></span>  <!-- 顯示頭像或帳號 -->
+                <span>最高分數: <span id="score-status"></span> </span>  <!-- 顯示分數 -->
+                <span style="display: none;">目前分數: <span id="score-status"></span> </span>  <!-- 顯示分數 -->
+                <span id="leaderboard-icon"> 排行榜</span>  <!-- 排行榜按鈕 -->
+            </div>
+            <!-- 起始畫面 -->
+            <div class="default_page" id="login-out-section">
+                <div id="game-logo">
+                    <h1>Flappy Capy & Cavy</h1>
+                </div>
+                <p id="game-description">幫助鼠鼠避開障礙物吧！輕觸螢幕即可跳高！加油</p>
+                <div class="game_btn_box">
+                    <!-- 登入後顯示的按鈕 -->
+                    <button id="start-game-btn">開始遊玩</button>
+                    <button id="logout-btn" style="display:none" onclick="logout()">登出</button>
+                    <!-- 尚未登入顯示登入與註冊 -->
+                    <button id="login-btn" style="display:none;">登入</button>
+                    <button id="register-btn" style="display:none;">註冊</button>
+                </div>
+            </div>
+            <!-- 遊戲內容畫面 -->
+            <div class="game_container" id="game-container">
+                <canvas id="gameCanvas"></canvas>
+               <img src="./src/img/avator_machi.png" alt="machi" id="game-charactor">
+            </div>
+            
+        </div>
+
+    </div>
+
+    <script type="module" src="./main.js"></script>
+    <script type="module" src="./game.js"></script>
+    
+</body>
+</html>
