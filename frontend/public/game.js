@@ -12,8 +12,11 @@ let gameCharacter = {
     height: 50, // 角色高度
     speed: 3,   // 角色跳躍速度
     velocity: 0, // 角色的垂直速度
-    image: "./src/img/avator_machi.png" // 角色圖片
+    image: "./src/img/avator_machi.png" // 預設角色圖片
 };
+
+// 預設頭像
+let userAvatar = "./src/img/avator_machi.png";  // 預設頭像
 
 // 障礙物的設置
 let obstacles = [];
@@ -46,29 +49,24 @@ function draw() {
 
 // 更新遊戲狀態
 function updateGame() {
-    // 處理角色的重力與跳躍
     gameCharacter.velocity += 0.5; // 重力加速度
     gameCharacter.y += gameCharacter.velocity; // 更新 Y 坐標
 
-    // 防止角色掉出畫面下方
     if (gameCharacter.y > window.innerHeight - gameCharacter.height) {
         gameCharacter.y = window.innerHeight - gameCharacter.height;
         gameCharacter.velocity = 0;
     }
 
-    // 監聽鍵盤按鍵來控制角色跳躍
     window.addEventListener("keydown", (e) => {
         if (e.key === " " || e.key === "ArrowUp") {  // 空格或上箭頭鍵
             gameCharacter.velocity = -10; // 跳躍
         }
     });
 
-    // 隨機生成障礙物
     if (Math.random() < 0.02) { // 隨機生成障礙物的機率
         createObstacle();
     }
 
-    // 更新障礙物位置
     obstacles.forEach((obstacle, index) => {
         obstacle.x -= 5; // 障礙物向左移動
         if (obstacle.x + obstacle.width < 0) { // 若障礙物離開畫面，刪除
@@ -76,11 +74,9 @@ function updateGame() {
         }
     });
 
-    // 更新分數
-    score += 1;  // 每一幀累積分數
+    score += 1;
     document.getElementById("score-status").textContent = score;
 
-    // 檢查遊戲是否結束
     checkGameOver();
 }
 
@@ -102,22 +98,19 @@ function createObstacle() {
 // 渲染遊戲畫面
 function renderGame() {
     const gameContainer = document.getElementById("game-container");
+    gameContainer.innerHTML = "";  // 清除畫布上的內容
 
-    // 清除畫布上的內容
-    gameContainer.innerHTML = "";
-
-    // 在畫布上繪製角色
     const characterElement = document.createElement("div");
+    characterElement.id = "game-character";  // 設置ID以便更新背景圖片
     characterElement.style.position = "absolute";
     characterElement.style.left = gameCharacter.x + "px";
     characterElement.style.top = gameCharacter.y + "px";
     characterElement.style.width = gameCharacter.width + "px";
     characterElement.style.height = gameCharacter.height + "px";
-    characterElement.style.backgroundImage = `url(${gameCharacter.image})`;
+    characterElement.style.backgroundImage = `url(${gameCharacter.image})`;  // 顯示選擇的角色
     characterElement.style.backgroundSize = "cover";
     gameContainer.appendChild(characterElement);
 
-    // 在畫布上繪製所有障礙物
     obstacles.forEach(obstacle => {
         const obstacleElement = document.createElement("div");
         obstacleElement.style.position = "absolute";
@@ -138,20 +131,45 @@ function stopGame() {
     alert("遊戲結束！分數：" + score);
 }
 
-// 設置遊戲結束的條件 (例如碰到障礙物)
+// 設置遊戲結束的條件
 function checkGameOver() {
-    // 檢查角色是否與障礙物發生碰撞
     obstacles.forEach(obstacle => {
         if (gameCharacter.x + gameCharacter.width > obstacle.x &&
             gameCharacter.x < obstacle.x + obstacle.width &&
             gameCharacter.y + gameCharacter.height > obstacle.y &&
             gameCharacter.y < obstacle.y + obstacle.height) {
-            stopGame(); // 角色與障礙物碰撞時停止遊戲
+            stopGame();
         }
     });
 
-    // 角色掉出畫面
     if (gameCharacter.y >= window.innerHeight - gameCharacter.height) {
-        stopGame(); // 角色掉出畫面時停止遊戲
+        stopGame();
     }
 }
+
+// 角色選擇邏輯
+document.getElementById("choose-hamster").addEventListener("click", function() {
+    userAvatar = "./src/img/avator_machi.png";  // 天竺鼠頭像
+    gameCharacter.image = "./src/img/avator_machi.png"; // 天竺鼠角色圖片
+    updateUserAvatar();
+    updateGameCharacter();
+});
+
+document.getElementById("choose-capybara").addEventListener("click", function() {
+    userAvatar = "./src/img/avator_pocky.png";  // 水豚頭像
+    gameCharacter.image = "./src/img/avator_pocky.png"; // 水豚角色圖片
+    updateUserAvatar();
+    updateGameCharacter();
+});
+
+// 更新用戶頭像
+function updateUserAvatar() {
+    document.getElementById("user-avator").src = userAvatar;  // 更新頭像
+}
+
+// 更新遊戲中的角色圖片
+function updateGameCharacter() {
+    const gameCharacterElement = document.getElementById("game-character");
+    gameCharacterElement.style.backgroundImage = `url(${gameCharacter.image})`;
+}
+

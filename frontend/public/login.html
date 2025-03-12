@@ -5,16 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>登入頁面 - Flappy Capy & Cavy</title>
     <link rel="stylesheet" href="./src/style.css">
+    <link rel="stylesheet" href="./src/reset.css">
 </head>
 <body>
-    <h1>登入您的帳號</h1>
-
-    <input type="text" id="username" placeholder="請輸入您的IG帳號">
-    <input type="password" id="password" placeholder="請輸入密碼">
-
-    <button id="login-btn">登入</button>
-    <button id="cancel-btn">取消</button>
-
+    <div class="log_page">
+        <h1>登入您的帳號</h1>
+        <input type="text" id="username" placeholder="請輸入您的IG帳號">
+        <input type="password" id="password" placeholder="請輸入密碼">
+        <button id="login-btn">登入</button>
+        <button id="cancel-btn">取消</button>
+    </div>
     <script type="module">
         import { login } from "./auth.js";
 
