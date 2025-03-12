@@ -1,7 +1,7 @@
 // firebase-config.js
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";  // CDN引入Firebase
 import { getAuth } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";  // CDN引入Firebase Auth
-import { getDatabase } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";  // 若需要Database也加這個
+import { getDatabase } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
 // Firebase 配置
 const firebaseConfig = {
@@ -19,3 +19,4 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getDatabase(app);  // 若你有用到 Realtime Database
+

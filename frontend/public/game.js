@@ -15,9 +15,6 @@ let gameCharacter = {
     image: "./src/img/avator_machi.png" // 預設角色圖片
 };
 
-// 預設頭像
-let userAvatar = "./src/img/avator_machi.png";  // 預設頭像
-
 // 障礙物的設置
 let obstacles = [];
 const obstacleImages = [
@@ -149,27 +146,17 @@ function checkGameOver() {
 
 // 角色選擇邏輯
 document.getElementById("choose-hamster").addEventListener("click", function() {
-    userAvatar = "./src/img/avator_machi.png";  // 天竺鼠頭像
     gameCharacter.image = "./src/img/avator_machi.png"; // 天竺鼠角色圖片
-    updateUserAvatar();
     updateGameCharacter();
 });
 
 document.getElementById("choose-capybara").addEventListener("click", function() {
-    userAvatar = "./src/img/avator_pocky.png";  // 水豚頭像
     gameCharacter.image = "./src/img/avator_pocky.png"; // 水豚角色圖片
-    updateUserAvatar();
     updateGameCharacter();
 });
-
-// 更新用戶頭像
-function updateUserAvatar() {
-    document.getElementById("user-avator").src = userAvatar;  // 更新頭像
-}
 
 // 更新遊戲中的角色圖片
 function updateGameCharacter() {
     const gameCharacterElement = document.getElementById("game-character");
     gameCharacterElement.style.backgroundImage = `url(${gameCharacter.image})`;
 }
-

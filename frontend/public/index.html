@@ -29,11 +29,11 @@
                         <button id="choose-hamster">選擇天竺鼠</button>
                         <button id="choose-capybara">選擇水豚</button>
                       </div>
-                    <button id="start-game-btn">開始遊玩</button>
-                    <button id="logout-btn" style="display:none" onclick="logout()">登出</button>
+                    <button id="start-game-btn" style="display:none" >開始遊玩</button>
+                    <button id="logout-btn"  onclick="logout()">登出</button>
                     <!-- 尚未登入顯示登入與註冊 -->
-                    <button id="login-btn" style="display:none;">登入</button>
-                    <button id="register-btn" style="display:none;">註冊</button>
+                    <button id="login-btn">登入</button>
+                    <button id="register-btn">註冊</button>
                 </div>
             </div>
             <!-- 遊戲內容畫面 -->
@@ -44,9 +44,31 @@
         </div>
 
     </div>
+        <!-- Lightbox for user profile -->
+    <div id="profile-modal" class="lightbox" style="display: none;">
+        <div class="lightbox-content">
+            <div class="profile-info">
+                <div>
+                    <img id="profile-avatar" src="./src/img/avator_pocky.png" alt="avatar" />
+                    <div>
+                        <p id="profile-username">Username: </p>
+                        <p id="profile-highscore">最高分數: 0</p>
+                    </div>
+                </div>
+            </div>
+            <div id="avatar-selection">
+                <img src="./src/img/avator_machi.png" alt="avatar1" class="avatar-option" onclick="selectNewAvatar('avator_machi.png')" />
+                <img src="./src/img/avator_pocky.png" alt="avatar2" class="avatar-option" onclick="selectNewAvatar('avatar2.png')" />
+            </div>
+            <button onclick="closeProfileModal()">關閉</button>
+        </div>
+    </div>
 
     <script type="module" src="./main.js"></script>
     <script type="module" src="./game.js"></script>
-    
+    <script type="module" src="./auth.js"></script>
+    <script type="module" src="firebase-config.js"></script>
+
+   
 </body>
 </html>
