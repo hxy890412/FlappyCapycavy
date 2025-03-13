@@ -23,6 +23,9 @@ const obstacleImages = [
     './src/img/carrot.png'  // 障礙物圖片3
 ];
 
+// 控制方式變數
+let controlMethod = "keyboard";  // 預設使用鍵盤控制
+
 // 設置遊戲開始邏輯
 export function startGame() {
     if (gameRunning) return; // 防止重複啟動遊戲
@@ -54,11 +57,22 @@ function updateGame() {
         gameCharacter.velocity = 0;
     }
 
-    window.addEventListener("keydown", (e) => {
-        if (e.key === " " || e.key === "ArrowUp") {  // 空格或上箭頭鍵
+    // 控制方式：鍵盤控制
+    if (controlMethod === "keyboard") {
+        window.addEventListener("keydown", (e) => {
+            if (e.key === " " || e.key === "ArrowUp") {  // 空格或上箭頭鍵
+                gameCharacter.velocity = -10; // 跳躍
+            }
+        });
+    }
+
+    // 控制方式：觸控控制
+    else if (controlMethod === "touch") {
+        window.addEventListener("touchstart", (e) => {
+            e.preventDefault();
             gameCharacter.velocity = -10; // 跳躍
-        }
-    });
+        });
+    }
 
     if (Math.random() < 0.02) { // 隨機生成障礙物的機率
         createObstacle();
@@ -126,7 +140,36 @@ function stopGame() {
     clearInterval(gameInterval); // 停止遊戲循環
     gameRunning = false;
     alert("遊戲結束！分數：" + score);
+
+    // const user = firebase.auth().currentUser;
+
+    // if (user) {
+    //     // 使用 user.uid 作為唯一識別符
+    //     const username = user.uid;  // 或者使用 user.displayName，如果你有設定用戶名
+    //     submitScoreToServer(username, score);
+    //     console.log("遊戲結束，登入狀態")
+    // } else {
+    //     console.log("尚未登入用戶");
+    // }
 }
+
+// function submitScoreToServer(username, score) {
+//     fetch("/submit-score", {
+//         method: "POST",
+//         headers: {
+//             "Content-Type": "application/json"
+//         },
+//         body: JSON.stringify({ username, score })
+//     })
+//     .then(response => response.json())
+//     .then(data => {
+//         console.log(data.message);
+//     })
+//     .catch(error => {
+//         console.error("提交分數時發生錯誤：", error);
+//     });
+// }
+
 
 // 設置遊戲結束的條件
 function checkGameOver() {
@@ -144,19 +187,23 @@ function checkGameOver() {
     }
 }
 
-// 角色選擇邏輯
-document.getElementById("choose-hamster").addEventListener("click", function() {
-    gameCharacter.image = "./src/img/avator_machi.png"; // 天竺鼠角色圖片
-    updateGameCharacter();
-});
-
-document.getElementById("choose-capybara").addEventListener("click", function() {
-    gameCharacter.image = "./src/img/avator_pocky.png"; // 水豚角色圖片
-    updateGameCharacter();
-});
-
-// 更新遊戲中的角色圖片
-function updateGameCharacter() {
-    const gameCharacterElement = document.getElementById("game-character");
-    gameCharacterElement.style.backgroundImage = `url(${gameCharacter.image})`;
+// 設置裝置控制方法
+function setControlMethod() {
+    if (window.innerWidth <= 800) {
+        // 手機版
+        controlMethod = "touch";
+    } else {
+        // 電腦版
+        controlMethod = "keyboard";
+    }
 }
+
+// 確認設備類型並設置控制方式
+window.addEventListener("DOMContentLoaded", () => {
+    setControlMethod();  // 設置控制方式
+
+    // 偵測視窗大小變化，重新判斷控制方式
+    window.addEventListener("resize", () => {
+        setControlMethod();
+    });
+});

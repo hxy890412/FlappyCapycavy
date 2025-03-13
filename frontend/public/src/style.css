@@ -90,6 +90,7 @@ button#registerBtn:hover, button#loginBtn:hover {
   padding: 10px;
   height: 36px;
   position: relative;
+  z-index: 999;
 }
 .navbar span{
   font-size: 14px;
@@ -98,7 +99,7 @@ button#registerBtn:hover, button#loginBtn:hover {
 
 /* 排行榜圖示的位置 */
 #leaderboard-icon {
-  background: #dae8ed url(img/avator_pocky.png) no-repeat center center / 30px;
+  background:url(img/avator_pocky.png) no-repeat center center / 30px;
   cursor: pointer;
   width: 30px;
   height: 36px;
@@ -172,6 +173,7 @@ button#registerBtn:hover, button#loginBtn:hover {
   gap: 12px;
   justify-content: flex-start;
   padding: 4px 8px;
+  z-index: 2;
 }
 .default_page{
   position: absolute;
@@ -218,6 +220,7 @@ button#registerBtn:hover, button#loginBtn:hover {
   display: none;
   justify-content: center;
   align-items: center;
+  z-index: 999;
 }
 
 .lightbox-content {

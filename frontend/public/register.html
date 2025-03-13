@@ -14,15 +14,15 @@
         <input type="password" id="password" placeholder="請輸入密碼">
         <input type="password" id="confirm-password" placeholder="請再次輸入密碼">
     
-        <button id="register-btn">確認註冊</button>
+        <button id="register-btn-sent">確認註冊</button>
         <button id="cancel-btn">取消</button>
     </div>
     
 
     <script type="module">
         import { register } from "./auth.js";
-
-        document.getElementById("register-btn").addEventListener("click", () => {
+        window.addEventListener('DOMContentLoaded', (event) => {
+            document.getElementById("register-btn-sent").addEventListener("click", () => {
             const username = document.getElementById("username").value;
             const password = document.getElementById("password").value;
             const confirmPassword = document.getElementById("confirm-password").value;
@@ -32,18 +32,20 @@
                 register(username, password)
                     .then(() => {
                         alert("註冊成功");
-                        window.location.href = "/index.html";  // 註冊成功後自動跳轉回首頁
+                        window.location.href = "/index.html";  // 返回首頁
                     })
                     .catch(err => alert("註冊失敗：" + err.message));  // 顯示錯誤訊息
             } else {
                 alert("密碼不一致");
             }
 
-        });
+            });
 
-        document.getElementById("cancel-btn").addEventListener("click", () => {
-            window.location.href = "/index.html";  // 返回首頁
+            document.getElementById("cancel-btn").addEventListener("click", () => {
+                window.location.href = "/index.html";  // 返回首頁
+            });
         });
+        
     </script>
 </body>
 </html>
