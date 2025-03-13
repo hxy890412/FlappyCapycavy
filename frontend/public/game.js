@@ -1,10 +1,11 @@
 // game.js
+import { auth, db } from './firebase-config.js';  // 根據實際路徑調整
+import { ref, get, set, update } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
 let gameInterval;  // 用來儲存遊戲的定時器 ID
-let score = 0;     // 記錄分數
+let score = 0;     // 記錄當前分數
 let gameRunning = false;  // 遊戲是否正在運行
 
-// 遊戲角色的初始設置
 let gameCharacter = {
     x: 50,     // 角色的 X 坐標
     y: 100,    // 角色的 Y 坐標
@@ -141,34 +142,46 @@ function stopGame() {
     gameRunning = false;
     alert("遊戲結束！分數：" + score);
 
-    // const user = firebase.auth().currentUser;
+    const user = auth.currentUser;
 
-    // if (user) {
-    //     // 使用 user.uid 作為唯一識別符
-    //     const username = user.uid;  // 或者使用 user.displayName，如果你有設定用戶名
-    //     submitScoreToServer(username, score);
-    //     console.log("遊戲結束，登入狀態")
-    // } else {
-    //     console.log("尚未登入用戶");
-    // }
+    if (user) {
+        const userRef = ref(db, 'users/' + user.uid);
+        const username = userRef.username;  // 若沒有設定 displayName，則使用 uid
+        submitScore(username, score);
+        console.log("遊戲結束，登入狀態");
+    } else {
+        console.log("尚未登入用戶");
+    }
 }
 
-// function submitScoreToServer(username, score) {
-//     fetch("/submit-score", {
-//         method: "POST",
-//         headers: {
-//             "Content-Type": "application/json"
-//         },
-//         body: JSON.stringify({ username, score })
-//     })
-//     .then(response => response.json())
-//     .then(data => {
-//         console.log(data.message);
-//     })
-//     .catch(error => {
-//         console.error("提交分數時發生錯誤：", error);
-//     });
-// }
+// 提交分數
+function submitScore(username, score) {
+    const leaderboardRef = ref(db, 'leaderboard/' + username);
+
+    // 先取得現有的分數
+    get(leaderboardRef).then(snapshot => {
+        const existingScore = snapshot.val()?.score || 0; // 取得已存的分數，若無則預設為0
+
+        // 判斷是否為最高分
+        if (score > existingScore) {
+            // 如果分數比較高，就更新分數
+            set(leaderboardRef, {
+                username: username,
+                score: score
+            }).then(() => {
+                console.log('分數提交成功');
+            }).catch((error) => {
+                console.error('提交分數時發生錯誤：', error);
+            });
+        } else {
+            console.log('分數未達到新高，未更新');
+        }
+    }).catch((error) => {
+        console.error('取得排行榜分數時發生錯誤：', error);
+    });
+}
+
+
 
 
 // 設置遊戲結束的條件
