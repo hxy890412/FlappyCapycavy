@@ -7,7 +7,7 @@ let gameInterval;  // 用來儲存遊戲的定時器 ID
 let obstacleInterval; 
 let score = 0;     // 記錄當前分數
 let gameRunning = false;  // 遊戲是否正在運行
-
+let grassHeight = 150;  // 草地高度
 let gameCharacter = {
     x: 50,     // 角色的 X 坐標
     y: 50,     // 角色的 Y 坐標
@@ -18,6 +18,11 @@ let gameCharacter = {
     image: new Image(), // 角色圖片對象
     imageSrc: "./src/img/avator_machi.png" // 預設角色圖片
 };
+
+let grassImage = new Image();  // 草地的圖片對象
+grassImage.src = "./src/img/grass.png";  // 草地圖片路徑
+
+let grassPosition = 0; // 用來控制草地滾動的變數
 
 // 載入角色圖片
 gameCharacter.image.src = gameCharacter.imageSrc;
@@ -91,7 +96,7 @@ export function startGame() {
     gameInterval = setInterval(gameLoop, 1000 / 60); // 每秒 60 幀，開始遊戲循環
     
     // 每隔一段時間生成一個新的障礙物
-    obstacleInterval = setInterval(createObstacle, 1000); // 每 1 秒生成一個新障礙物
+    obstacleInterval = setInterval(createObstacle, 2000); // 每 1 秒生成一個新障礙物
 }
 
 // 設置遊戲控制
@@ -111,14 +116,14 @@ function setupControls() {
 // 鍵盤控制
 function handleKeyDown(e) {
     if (e.key === " " || e.key === "ArrowUp") {  // 空格或上箭頭鍵
-        gameCharacter.velocity = -8; // 跳躍
+        gameCharacter.velocity = -7; // 跳躍
     }
 }
 
 // 觸控控制
 function handleTouchStart(e) {
     e.preventDefault();
-    gameCharacter.velocity = -8; // 跳躍
+    gameCharacter.velocity = -7; // 跳躍
 }
 
 // 遊戲主循環
@@ -133,17 +138,23 @@ function updateGame() {
     gameCharacter.y += gameCharacter.velocity; // 更新 Y 坐標
 
     // 限制角色不會跳出畫面，保持在固定範圍內
-    if (gameCharacter.y > canvas.height - gameCharacter.height) {
-        gameCharacter.y = canvas.height - gameCharacter.height;
+    if (gameCharacter.y > canvas.height - gameCharacter.height - 100) {
+        gameCharacter.y = canvas.height - gameCharacter.height - 100;
         gameCharacter.velocity = 0;
     } else if (gameCharacter.y < 0) {  // 確保角色不會飛出畫面上方
         gameCharacter.y = 0;
         gameCharacter.velocity = 0;
     }
 
+    // 更新草地的位置，使其不斷滾動
+    grassPosition -= 2;  // 每次更新時讓草地向左移動
+    if (grassPosition <= -canvas.width) {  // 草地滾動完畢後重置
+        grassPosition = 0;
+    }
+
     // 更新障礙物位置
     obstacles.forEach((obstacle, index) => {
-        obstacle.x -= 5; // 障礙物向左移動
+        obstacle.x -= 3; // 障礙物向左移動
         if (obstacle.x + obstacle.width < 0) { // 若障礙物離開畫面，刪除
             obstacles.splice(index, 1);
         }
@@ -164,17 +175,24 @@ function updateGame() {
 // 隨機生成障礙物（水管）
 function createObstacle() {
     const gapHeight = 150; // 水管間隙的高度
-    const pipeHeight = Math.floor(Math.random() * (canvas.height - gapHeight)); // 隨機產生上水管的高度
-    const pipeWidth = 50;
+    const grassHeight = 150;
 
-    // 上水管和下水管的對齊方式
-    const topPipeHeight = pipeHeight;  // 上水管的高度
-    const bottomPipeHeight = canvas.height - topPipeHeight - gapHeight;  // 下水管的高度
+    // 隨機產生上水管的高度，確保上水管位於草地之上
+    const maxTopHeight = canvas.height - gapHeight - grassHeight;  // 最大的上水管高度（防止下水管為負數）
+    const topPipeHeight = Math.floor(Math.random() * maxTopHeight); // 隨機產生上水管的高度
+
+    // 計算下水管的高度
+    const bottomPipeHeight = canvas.height - topPipeHeight - gapHeight - grassHeight; // 下水管的高度，減去草地的影響
+
+    // 確保下水管不會出現負值（這樣就會保持正確的水管間隙）
+    if (bottomPipeHeight < 0) {
+        return; // 如果計算出來的下水管高度是負數，則不創建這個水管
+    }
 
     // 創建一個水管對象，包含上水管和下水管
     obstacles.push({
         x: canvas.width,   // 障礙物從畫面右邊進來
-        width: pipeWidth,
+        width: 50,  // 水管寬度
         gapHeight: gapHeight,  // 水管間隙高度
         topHeight: topPipeHeight,  // 上水管的高度
         bottomHeight: bottomPipeHeight,  // 下水管的高度
@@ -182,11 +200,16 @@ function createObstacle() {
     });
 }
 
+
 // 渲染遊戲畫面
 function renderGame() {
     // 清除畫布
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-   
+    
+    // 繪製草地（滾動效果）
+    ctx.drawImage(grassImage, grassPosition, canvas.height - grassHeight, canvas.width, grassHeight);  
+    ctx.drawImage(grassImage, grassPosition + canvas.width, canvas.height - grassHeight, canvas.width, grassHeight); 
+
     // 繪製角色
     ctx.drawImage(gameCharacter.image, gameCharacter.x, gameCharacter.y, gameCharacter.width, gameCharacter.height);
     
@@ -196,7 +219,7 @@ function renderGame() {
         ctx.drawImage(carrotImage, obstacle.x, 0, obstacle.width, obstacle.topHeight);
         
         // 繪製下水管
-        ctx.drawImage(carrotImage, obstacle.x, canvas.height - obstacle.bottomHeight, obstacle.width, obstacle.bottomHeight);
+        ctx.drawImage(carrotImage, obstacle.x, canvas.height - obstacle.bottomHeight - grassHeight , obstacle.width, obstacle.bottomHeight);
     });
 }
 
@@ -284,14 +307,19 @@ window.closeGameOverBox = function() {
 
 // 設置遊戲結束的條件
 function checkGameOver() {
+    // 檢查是否碰到障礙物
     obstacles.forEach(obstacle => {
-        // 檢查是否碰到障礙物
         if (gameCharacter.x + gameCharacter.width > obstacle.x &&
             gameCharacter.x < obstacle.x + obstacle.width &&
-            (gameCharacter.y < obstacle.topHeight || gameCharacter.y + gameCharacter.height > canvas.height - obstacle.bottomHeight)) {
+            (gameCharacter.y < obstacle.topHeight || gameCharacter.y + gameCharacter.height > canvas.height - obstacle.bottomHeight - grassHeight)) {
             stopGame();
         }
     });
+
+    // 檢查是否掉出畫面，碰到草地底部
+    if (gameCharacter.y + gameCharacter.height >= canvas.height - grassHeight) {
+        stopGame();
+    }
 }
 
 // 設置裝置控制方法
