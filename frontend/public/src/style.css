@@ -191,7 +191,7 @@ button#registerBtn:hover, button#loginBtn:hover {
   position: relative;
   width: 100%;
   height: 100%;
-  padding-top: 36px;
+  overflow: hidden;
 }
 
 .game_container #game-charactor{
@@ -203,11 +203,7 @@ button#registerBtn:hover, button#loginBtn:hover {
   transform: translateY(-50%);
 }
 
-#gameCanvas{
-  width: 100%;
-  max-width: 600px;
-  height: 100%;
-}
+
 
 /* Lightbox 样式 */
 .lightbox {
