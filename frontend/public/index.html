@@ -2,12 +2,10 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <title>Flappy Capy & Cavy</title>
     <link rel="stylesheet" href="./src/style.css">
     <link rel="stylesheet" href="./src/reset.css">
-   
-
 </head>
 
 <body>
@@ -28,8 +26,8 @@
                 <div class="game_btn_box">
                     <!-- 登入後顯示的按鈕 -->
                     <div id="character-selection" style="display: none;">
-                        <button id="choose-hamster">選擇天竺鼠</button>
-                        <button id="choose-capybara">選擇水豚</button>
+                        <img src="./src/img/avator_machi.png" alt="machi" id="choose-machi">
+                        <img src="./src/img/avator_pocky.png" alt="pocky" id="choose-capybara">
                       </div>
                     <button id="start-game-btn" style="display:none" >開始遊玩</button>
                     <button id="logout-btn"style="display:none" >登出</button>
@@ -42,13 +40,23 @@
             <div class="game_container" id="game-container">
                 <canvas id="gameCanvas"></canvas>
             </div>
+
             
         </div>
 
     </div>
    
 
-        <!-- Lightbox for user profile -->
+    <!-- 遊戲結束畫面 -->
+    <div class="gameover lightbox" id="game-over" style="display: none;">
+        <div class="lightbox-content">
+            <h2>遊戲結束</h2>
+            <p>你的分數是：<span id="user-highscore"></span></p>
+            <button onclick="closeGameOverBox()">關閉</button>
+            <button onclick="restartgame()">重新開始</button>
+        </div>
+    </div>
+    <!-- 個人資料視窗 -->
     <div id="profile-modal" class="lightbox" style="display: none;">
         <div class="lightbox-content">
             <div class="profile-info">

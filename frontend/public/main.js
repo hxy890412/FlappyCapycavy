@@ -139,6 +139,10 @@ window.openProfileModal = function () {
 window.closeProfileModal = function () {
   document.getElementById("profile-modal").style.display = "none";
 };
+window.closeGameOverBox = function () {
+  document.getElementById("game-over").style.display = "none";
+  document.getElementById("login-out-section").style.display = "block";
+};
 
 
 
