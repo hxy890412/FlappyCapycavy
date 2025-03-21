@@ -10,7 +10,7 @@ let gameRunning = false;  // 遊戲是否正在運行
 let grassHeight = 150;  // 草地高度
 let gameCharacter = {
     x: 50,     // 角色的 X 坐標
-    y: 50,     // 角色的 Y 坐標
+    y: 250,     // 角色的 Y 坐標
     width: 50,  // 角色寬度
     height: 50, // 角色高度
     speed: 3,   // 角色跳躍速度
@@ -49,10 +49,9 @@ function initCanvas() {
     canvas.height = window.innerHeight * 0.99; 
     // 設置Canvas大小為視窗大小
     resizeCanvas();
-    
     // 監聽窗口大小變化
     window.addEventListener("resize", resizeCanvas);
-    
+    renderGame();
     // 角色選擇邏輯
     const chooseMachi = document.getElementById("choose-machi");
     const chooseCapybara = document.getElementById("choose-capybara");
@@ -85,7 +84,7 @@ export function startGame() {
     // 重設遊戲狀態
     score = 0;
     passedObstacles = 0; // 重設通過的水管數量
-    gameCharacter.y = 50;  // 重設角色的Y坐標
+    gameCharacter.y = 250;  // 重設角色的Y坐標
     gameCharacter.velocity = 0;
     obstacles = [];
     document.getElementById("score-status").textContent = score;
@@ -245,14 +244,8 @@ function stopGame() {
             if (snapshot.exists()) {
                 const userData = snapshot.val();
                 const username = userData.username || "未知用戶"; // 確保 username 存在
-                // 提交分數
-                // submitScore(username, score).then(() => {
-                //     fetchLeaderboard(username);
-                // });
                 submitScore(username, score);
                 console.log("遊戲結束，登入狀態，使用者名稱：", username);
-
-
             } else {
                 console.error("無法取得使用者資料");
             }
