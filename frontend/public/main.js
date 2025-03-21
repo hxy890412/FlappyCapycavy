@@ -3,28 +3,55 @@ import { startGame } from "./game.js";
 import { auth, db } from "./firebase-config.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 import { ref, get, set, update } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+import { fetchLeaderboard, fetchUserRank} from "./leaderboard.js";
 
 window.addEventListener("load", () => {
   const startGameBtn = document.getElementById("start-game-btn");
   const loginBtn = document.getElementById("login-btn");
   const registerBtn = document.getElementById("register-btn");
   const logoutBtn = document.getElementById("logout-btn");
-  const characterSelection = document.getElementById("character-selection");
-
-  startGameBtn.addEventListener("click", () => {
-    startGame();
-    document.getElementById("login-out-section").style.display = "none";
-  });
+  const openleaderboard = document.getElementById("leaderboard-icon");
+  const viewLeaderboardButton = document.getElementById("viewleaderboard");
+  const closeButtons = document.querySelectorAll('.lightbox .close-btn');
 
   loginBtn.addEventListener("click", () => (window.location.href = "/login.html"));
   registerBtn.addEventListener("click", () => (window.location.href = "/register.html"));
   logoutBtn.addEventListener("click", logout);
+  startGameBtn.addEventListener("click", startGame);
+  openleaderboard.addEventListener("click", showLeaderboard);
+  viewLeaderboardButton.addEventListener("click", showLeaderboard);
+  
+  closeButtons.forEach(button => {
+    button.addEventListener('click', () => {
+        // 這裡關閉的就是點擊的按鈕所在的父級 .lightbox 元素
+        const lightbox = button.closest('.lightbox');
+        if (lightbox) {
+            lightbox.style.display = 'none';
+        }
+    });
+});
 
   // 檢查用戶登入狀態並更新 UI
   checkUserStatus();
 });
 
+// 打開排行榜
+async function showLeaderboard() {
+  // 顯示排行榜視窗
+  document.getElementById("leaderboard-container").style.display = "flex";
 
+  // 清空舊的排行榜數據
+  const leaderboardContainer = document.getElementById("10_rank");
+  leaderboardContainer.innerHTML = ""; // 清空之前顯示的排行榜
+  
+  // 等待排行榜數據和用戶排名加載完成
+  try {
+      await fetchLeaderboard();  // 確保取得排行榜數據
+      await fetchUserRank();     // 確保取得用戶的排名
+  } catch (error) {
+      console.error("加載排行榜時發生錯誤:", error);
+  }
+}
 
 // 檢查用戶登入狀態並更新 UI
 export function checkUserStatus() {
@@ -37,6 +64,7 @@ export function checkUserStatus() {
     const registerBtn = document.getElementById("register-btn");
     const logoutBtn = document.getElementById("logout-btn");
     const characterSelection = document.getElementById("character-selection");
+    const userhighScore = document.getElementById("score-highscore");
     if (user) {
       // 如果用戶已登入，顯示用戶的頭像和分數
       const userRef = ref(db, "users/" + user.uid);
@@ -48,7 +76,6 @@ export function checkUserStatus() {
             console.log("用戶資料:", userData); // 輸出用戶資料以檢查是否正確
             const username = userData.username;
             const avatarUrl = userData.avatarUrl || "./src/img/avator_pocky.png"; // 預設頭像
-            const highscore = userData.highscore || 0;
 
             // 更新 UI，顯示用戶名稱和頭像
             const userStatusElement = document.getElementById("user-status");
@@ -59,11 +86,32 @@ export function checkUserStatus() {
                         `;
             }
 
+           // **從 leaderboard/$username 取得 highscore**
+           const leaderboardRef = ref(db, "leaderboard/" + username);
+           get(leaderboardRef).then((leaderboardSnapshot) => {
+               let highscore = 0;
+               if (leaderboardSnapshot.exists()) {
+                   highscore = leaderboardSnapshot.val().highscore || 0;
+               }
+               // **即時更新所有 `userhighscore` 類別的元素**
+              document.querySelectorAll(".userhighscore").forEach(element => {
+                element.innerText = highscore;
+              });
+               console.log("使用者最高分：" + highscore);
+           }).catch((error) => {
+               console.error("讀取排行榜數據失敗:", error);
+               let highscore = 0;
+           });
+
+
+           
+
             startGameBtn.style.display = "block";
             loginBtn.style.display = "none";
             registerBtn.style.display = "none";
             logoutBtn.style.display = "block";
             characterSelection.style.display = "block";
+            
 
             const isNewUser = userData.isNewUser;
 
@@ -124,7 +172,7 @@ window.openProfileModal = function () {
         // 更新 lightbox 顯示的資料
         document.getElementById("profile-avatar").src = avatarUrl;
         document.getElementById("profile-username").innerText = `Username: ${username}`;
-        document.getElementById("profile-highscore").innerText = `最高分數: ${highscore}`;
+        // document.getElementById("profile-highscore").innerText = `最高分數: ${highscore}`;
       }
     })
     .catch((error) => {
@@ -136,12 +184,10 @@ window.openProfileModal = function () {
 
 
 
-window.closeProfileModal = function () {
-  document.getElementById("profile-modal").style.display = "none";
-};
 window.closeGameOverBox = function () {
-  document.getElementById("game-over").style.display = "none";
-  document.getElementById("login-out-section").style.display = "block";
+  // document.getElementById("game-over").style.display = "none";
+  // document.getElementById("login-out-section").style.display = "block";
+  window.location.href = "index.html";
 };
 
 

@@ -1,5 +1,5 @@
 // game.js
-import { auth, db } from './firebase-config.js';  // 根據實際路徑調整
+import { auth, db } from './firebase-config.js';
 import { ref, get, set, update } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
 let canvas, ctx;
@@ -80,7 +80,8 @@ function resizeCanvas() {
 // 設置遊戲開始邏輯
 export function startGame() {
     if (gameRunning) return; // 防止重複啟動遊戲
-
+    document.getElementById("login-out-section").style.display = "none";
+    document.getElementById("showscore-status").style.display = "block";
     // 重設遊戲狀態
     score = 0;
     passedObstacles = 0; // 重設通過的水管數量
@@ -231,7 +232,7 @@ function stopGame() {
     gameRunning = false;
 
     const gameOverElement = document.getElementById("game-over");
-    const scoreElement = document.getElementById("user-highscore");
+    const scoreElement = document.getElementById("user-finalscore");
     scoreElement.textContent = score;
     gameOverElement.style.display = "flex";
 
@@ -244,8 +245,14 @@ function stopGame() {
             if (snapshot.exists()) {
                 const userData = snapshot.val();
                 const username = userData.username || "未知用戶"; // 確保 username 存在
+                // 提交分數
+                // submitScore(username, score).then(() => {
+                //     fetchLeaderboard(username);
+                // });
                 submitScore(username, score);
                 console.log("遊戲結束，登入狀態，使用者名稱：", username);
+
+
             } else {
                 console.error("無法取得使用者資料");
             }
@@ -264,17 +271,33 @@ function submitScore(username, score) {
     get(leaderboardRef).then(snapshot => {
         const existingScore = snapshot.val()?.highscore || 0;
         const userId = auth.currentUser.uid; 
+        const gameOverElement = document.getElementById("game-over");
+        const lightboxContent = gameOverElement.querySelector(".lightbox-content");
+
         if (score > existingScore) {
             set(leaderboardRef, {
                 uid: userId,
                 highscore: score
             }).then(() => {
                 console.log('分數提交成功');
+                document.querySelectorAll(".userhighscore").forEach(element => {
+                    element.innerText = score;
+                });
+
+                const newRecordMessage = document.createElement("div");
+                newRecordMessage.classList.add("NewRecord");
+                newRecordMessage.textContent = "新紀錄!"; // 使用 textContent，這樣可以避免被轉換為字符串
+
+                lightboxContent.appendChild(newRecordMessage); // 將新元素添加到 lightboxContent 中
             }).catch((error) => {
                 console.error('提交分數時發生錯誤：', error);
             });
         } else {
             console.log('分數未達到新高，未更新');
+            const newRecordMessage = gameOverElement.querySelector(".NewRecord");
+            if (newRecordMessage) {
+                newRecordMessage.remove();
+            }
         }
     }).catch((error) => {
         console.error('取得排行榜分數時發生錯誤：', error);

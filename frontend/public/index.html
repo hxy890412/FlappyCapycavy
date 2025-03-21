@@ -6,6 +6,7 @@
     <title>Flappy Capy & Cavy</title>
     <link rel="stylesheet" href="./src/style.css">
     <link rel="stylesheet" href="./src/reset.css">
+
 </head>
 
 <body>
@@ -13,8 +14,8 @@
         <div class="container">
             <div id="navbar">
                 <span id="user-status" class="user-status"></span>  <!-- 顯示頭像或帳號 -->
-                <span>最高分數: <span id="score-status"></span> </span>  <!-- 顯示分數 -->
-                <span style="display: none;">目前分數: <span id="score-status"></span> </span>  <!-- 顯示分數 -->
+                <span>最高分數: <span class="userhighscore"></span> </span>  <!-- 顯示分數 -->
+                <span style="display: none;"id="showscore-status">目前分數: <span id="score-status"></span> </span>  <!-- 顯示分數 -->
                 <span id="leaderboard-icon"></span>
             </div>
             <!-- 起始畫面 -->
@@ -40,22 +41,37 @@
             <div class="game_container" id="game-container">
                 <canvas id="gameCanvas"></canvas>
             </div>
-
             
         </div>
 
     </div>
-   
+    <!-- gameover訊息 -->
+   <div class="game-over-message" style="display: none;">GAME OVER</div>
 
     <!-- 遊戲結束畫面 -->
     <div class="gameover lightbox" id="game-over" style="display: none;">
         <div class="lightbox-content">
             <h2>遊戲結束</h2>
-            <p>你的分數是：<span id="user-highscore"></span></p>
-            <button onclick="closeGameOverBox()">關閉</button>
+            <p>你的分數是：<span id="user-finalscore"></span></p>
+            <p>你的最高分數: <span class="userhighscore"></span></p>
+            <button onclick="closeGameOverBox()">回首頁</button>
             <button onclick="restartgame()">重新開始</button>
+            <button id="viewleaderboard">查看排行榜</button>
         </div>
     </div>
+    <!-- 排行榜 -->
+     <div class="lightbox leaderboard" id="leaderboard-container" style="display: none;">
+        <div class="lightbox-content">
+            <div id="10_rank">
+            
+            </div>
+            <div class="user_rank">
+
+            </div>
+        </div>
+        <button class="close-btn">X</button>
+     </div>
+
     <!-- 個人資料視窗 -->
     <div id="profile-modal" class="lightbox" style="display: none;">
         <div class="lightbox-content">
@@ -64,7 +80,7 @@
                     <img id="profile-avatar" src="./src/img/avator_pocky.png" alt="avatar" />
                     <div>
                         <p id="profile-username">Username: </p>
-                        <p id="profile-highscore">最高分數: 0</p>
+                        <p>最高分數: <span class="userhighscore"></span></p>
                     </div>
                 </div>
             </div>
@@ -72,14 +88,14 @@
                 <img src="./src/img/avator_machi.png" alt="avatar1" class="avatar-option" onclick="selectNewAvatar('/src/img/avator_machi.png')" />
                 <img src="./src/img/avator_pocky.png" alt="avatar2" class="avatar-option" onclick="selectNewAvatar('/src/img/avator_pocky.png')" />
             </div>
-            <button onclick="closeProfileModal()">關閉</button>
+            <button class="close-btn">關閉</button>
         </div>
     </div>
     <script type="module" src="firebase-config.js"></script>
     <script type="module" src="./auth.js"></script>
     <script type="module" src="./main.js"></script>
     <script type="module" src="./game.js"></script>
-   
+    <script type="module" src="./leaderboard.js" defer></script>
     
 </body>
 </html>
