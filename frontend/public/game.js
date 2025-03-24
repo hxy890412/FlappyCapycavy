@@ -2,6 +2,7 @@
 import { auth, db } from './firebase-config.js';
 import { ref, get, set, update } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
+
 let canvas, ctx;
 let gameInterval;  // 用來儲存遊戲的定時器 ID
 let obstacleInterval; 
@@ -12,12 +13,16 @@ let gameCharacter = {
     x: 50,     // 角色的 X 坐標
     y: 250,     // 角色的 Y 坐標
     width: 50,  // 角色寬度
-    height: 50, // 角色高度
+    height: 41, // 角色高度
     speed: 3,   // 角色跳躍速度
     velocity: 0, // 角色的垂直速度
     image: new Image(), // 角色圖片對象
-    imageSrc: "./src/img/avator_machi.png" // 預設角色圖片
+    imageSrc: "./src/img/machi.png" // 預設角色圖片
 };
+
+
+
+
 
 let grassImage = new Image();  // 草地的圖片對象
 grassImage.src = "./src/img/grass.png";  // 草地圖片路徑
@@ -57,12 +62,12 @@ function initCanvas() {
     const chooseCapybara = document.getElementById("choose-capybara");
 
     chooseMachi.addEventListener("click", function() {
-        gameCharacter.imageSrc = "./src/img/avator_machi.png";
+        gameCharacter.imageSrc = "./src/img/machi.png";
         gameCharacter.image.src = gameCharacter.imageSrc;
     });
 
     chooseCapybara.addEventListener("click", function() {
-        gameCharacter.imageSrc = "./src/img/avator_pocky.png";
+        gameCharacter.imageSrc = "./src/img/pocky.png";
         gameCharacter.image.src = gameCharacter.imageSrc;
     });
     

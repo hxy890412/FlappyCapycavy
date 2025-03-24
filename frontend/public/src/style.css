@@ -8,6 +8,8 @@ body {
   padding: 0;
 }
 
+
+
 h1 {
   text-align: center;
   color: #333; /* 深灰色 */
@@ -42,17 +44,17 @@ button {
   padding: 12px;
   margin: 10px 0;
   display: block;
-  background-color: #4CAF50; /* 綠色背景 */
-  color: white;
-  border: none;
-  border-radius: 5px;
+  background-color: #e0d5d2; /* 綠色背景 */
+  color: #413531;
+  border: 2px solid #413531;
+  border-radius: 0px;
   font-size: 18px;
   cursor: pointer;
 }
 
 /* 按鈕懸停效果 */
 button:hover {
-  background-color: #45a049; /* 當鼠標懸停時，顏色稍微變暗 */
+  background-color: #d0c1bc; /* 當鼠標懸停時，顏色稍微變暗 */
 }
 
 /* 登入註冊按鈕樣式 */
@@ -65,20 +67,19 @@ button#registerBtn:hover, button#loginBtn:hover {
 }
 
 #user-status {
-  font-size: 14px;
-  line-height: 20px;
+  font-size: 16px;
+  line-height: 40px;
   color: #FFF;
   position: relative;
   display: inline-block;
-  padding: 4px 8px 4px 28px;
-  background-color: #008CBA;
+  padding: 4px 8px 4px 55px;
 }
 
 #user-avator{
   position: absolute;
   left: 0;
-  width: 20px;
-  height: 20px;
+  width: 50px;
+  height: 50px;
   top: 50%;
   transform: translateY(-50%);
 }
@@ -99,10 +100,10 @@ button#registerBtn:hover, button#loginBtn:hover {
 
 /* 排行榜圖示的位置 */
 #leaderboard-icon {
-  background:url(img/avator_pocky.png) no-repeat center center / 30px;
+  background:url(img/avator_machi.png) no-repeat center center / 50px;
   cursor: pointer;
-  width: 30px;
-  height: 36px;
+  width: 50px;
+  height: 50px;
   position: absolute;
   right: 8px;
   top: 4px;
@@ -163,6 +164,15 @@ button#registerBtn:hover, button#loginBtn:hover {
   width: 100%;
   height: 100dvh;
   position: relative;
+  background: #ece1d2 url(img/bg_bottom.png) no-repeat bottom center / 100% 150px;
+  position: relative;
+}
+.container::before{
+  content:'';
+  position: absolute;
+  background:url(img/bg_middle.png) no-repeat center bottom 150px / 100%;
+  width: 100%;
+  height: 100%;
 }
 #navbar{
   position: absolute;
@@ -174,6 +184,24 @@ button#registerBtn:hover, button#loginBtn:hover {
   justify-content: flex-start;
   padding: 4px 8px;
   z-index: 2;
+  align-items: center;
+}
+
+#showscore-status{
+  position: absolute;
+  top: 20%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 40px;
+  z-index: 997;
+}
+#showscore-status span{
+  font-size: 36px;
+  line-height: 40px;
+  color: #e8dbd5;
+  text-shadow: 1px 1px #625c59,2px 2px #625c59,3px 3px #625c59,4px 4px #625c59;
+
 }
 .default_page{
   position: absolute;
@@ -220,12 +248,12 @@ button#registerBtn:hover, button#loginBtn:hover {
 }
 
 .lightbox-content {
-  background: white;
+  background: #e0d5d2;
   padding: 20px;
   width: 80%;
   max-width: 500px;
   text-align: center;
-  border-radius: 10px;
+  border: 6px solid #413531;
 }
 
 .profile-info {
@@ -236,11 +264,29 @@ button#registerBtn:hover, button#loginBtn:hover {
 
 .avatar-option {
   cursor: pointer;
-  width: 50px;
-  height: 50px;
-  margin: 10px;
-  border-radius: 50%;
+  width: 60px;
+  height: 60px;
 }
 
 /* leaderboard */
-
+.leaderboard .lightbox-content{
+  position: relative;
+  min-height: 70%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.leaderboard .close-btn.btn_fixed{
+  position: absolute;
+  top: -15px;
+  right: -15px;
+  width: 30px;
+  height: 30px;
+  background-color: #3d3835;
+  font-size: 12px;
+  line-height: 30px;
+  color: #FFF;
+  margin: 0;
+  padding: 0;
+  border-radius: 0;
+}

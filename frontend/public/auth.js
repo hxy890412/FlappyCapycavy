@@ -50,6 +50,7 @@ export function logout() {
         // 登出成功，更新 UI
         alert("已登出");
         checkUserStatus();  // 重新檢查用戶狀態，更新UI
+        window.location.href = "/index.html";
     }).catch((error) => {
         console.error("登出錯誤:", error.message);
     });

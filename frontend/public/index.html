@@ -15,9 +15,10 @@
             <div id="navbar">
                 <span id="user-status" class="user-status"></span>  <!-- 顯示頭像或帳號 -->
                 <span>最高分數: <span class="userhighscore"></span> </span>  <!-- 顯示分數 -->
-                <span style="display: none;"id="showscore-status">目前分數: <span id="score-status"></span> </span>  <!-- 顯示分數 -->
+                
                 <span id="leaderboard-icon"></span>
             </div>
+            <span style="display: none;"id="showscore-status"><span id="score-status"></span> </span>  <!-- 顯示分數 -->
             <!-- 起始畫面 -->
             <div class="default_page" id="login-out-section">
                 <div id="game-logo">
@@ -27,8 +28,8 @@
                 <div class="game_btn_box">
                     <!-- 登入後顯示的按鈕 -->
                     <div id="character-selection" style="display: none;">
-                        <img src="./src/img/avator_machi.png" alt="machi" id="choose-machi">
-                        <img src="./src/img/avator_pocky.png" alt="pocky" id="choose-capybara">
+                        <img src="./src/img/machi.png" alt="machi" id="choose-machi">
+                        <img src="./src/img/pocky.png" alt="pocky" id="choose-capybara">
                       </div>
                     <button id="start-game-btn" style="display:none" >開始遊玩</button>
                     <button id="logout-btn"style="display:none" >登出</button>
@@ -68,8 +69,9 @@
             <div class="user_rank">
 
             </div>
+            <button class="close-btn btn_fixed">X</button>
         </div>
-        <button class="close-btn">X</button>
+       
      </div>
 
     <!-- 個人資料視窗 -->
