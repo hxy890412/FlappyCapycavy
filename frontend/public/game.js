@@ -2,39 +2,38 @@
 import { auth, db } from './firebase-config.js';
 import { ref, get, set, update } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
-
 let canvas, ctx;
 let gameInterval;  // 用來儲存遊戲的定時器 ID
 let obstacleInterval; 
 let score = 0;     // 記錄當前分數
 let gameRunning = false;  // 遊戲是否正在運行
 let grassHeight = 150;  // 草地高度
+let lives = 3; // 生命數量
+let obstacleSpeed = 3;
+let isPaused = false;
+let isInvincible = false;
+let invincibilityTimer = null;
+
 let gameCharacter = {
     x: 50,     // 角色的 X 坐標
-    y: 250,     // 角色的 Y 坐標
+    y: 60,     // 角色的 Y 坐標
     width: 50,  // 角色寬度
     height: 41, // 角色高度
     speed: 3,   // 角色跳躍速度
     velocity: 0, // 角色的垂直速度
     image: new Image(), // 角色圖片對象
-    imageSrc: "./src/img/machi.png" // 預設角色圖片
+    imageSrc: "./src/img/machi.png", // 預設角色圖片
+    invincibleImage: "./src/img/machi_invincible.png"// 預設角色圖片
 };
-
-
-
-
-
-let grassImage = new Image();  // 草地的圖片對象
-grassImage.src = "./src/img/grass.png";  // 草地圖片路徑
-
-let grassPosition = 0; // 用來控制草地滾動的變數
-
-// 載入角色圖片
 gameCharacter.image.src = gameCharacter.imageSrc;
-
-// 創建胡蘿蔔圖片
-let carrotImage = new Image();
+// 載入圖片
+let grassImage = new Image();  // 草地
+grassImage.src = "./src/img/grass.png"; 
+let grassPosition = 0; // 用來控制草地滾動的變數
+let carrotImage = new Image(); // 水管
 carrotImage.src = "./src/img/carrot.png";
+let heartImage = new Image(); // 生命
+heartImage.src = "./src/img/heart.png";
 
 // 障礙物的設置：上下水管
 let obstacles = [];
@@ -62,14 +61,27 @@ function initCanvas() {
     const chooseCapybara = document.getElementById("choose-capybara");
 
     chooseMachi.addEventListener("click", function() {
+        chooseMachi.src = "./src/img/machi_select.png"
+        chooseCapybara.src = "./src/img/pocky_unselect.png"
         gameCharacter.imageSrc = "./src/img/machi.png";
         gameCharacter.image.src = gameCharacter.imageSrc;
+        console.log("角色是machi")
     });
 
     chooseCapybara.addEventListener("click", function() {
+        chooseCapybara.src = "./src/img/pocky_select.png"
+        chooseMachi.src = "./src/img/machi_unselect.png"
         gameCharacter.imageSrc = "./src/img/pocky.png";
         gameCharacter.image.src = gameCharacter.imageSrc;
+        gameCharacter.invincibleImage = "./src/img/pocky_invincible.png"
+        console.log("角色是pocky")
     });
+
+    if(gameCharacter.imageSrc === "./src/img/machi.png"){
+        gameCharacter.invincibleImage = "./src/img/machi_invincible.png";
+    }else{
+        gameCharacter.invincibleImage = "./src/img/pocky_invincible.png"
+    }
     
     // 設置控制方式
     setControlMethod();
@@ -84,16 +96,16 @@ function resizeCanvas() {
 // 設置遊戲開始邏輯
 export function startGame() {
     if (gameRunning) return; // 防止重複啟動遊戲
-    document.getElementById("login-out-section").style.display = "none";
-    document.getElementById("showscore-status").style.display = "block";
     // 重設遊戲狀態
+    isPaused = false;
     score = 0;
     passedObstacles = 0; // 重設通過的水管數量
-    gameCharacter.y = 250;  // 重設角色的Y坐標
+    gameCharacter.y = 60;  // 重設角色的Y坐標
     gameCharacter.velocity = 0;
     obstacles = [];
+    lives = 3; // 重置生命值
     document.getElementById("score-status").textContent = score;
-
+    document.getElementById("container-bg").style.background = "#E7F3F9";
     // 設置遊戲控制
     setupControls();
 
@@ -103,6 +115,48 @@ export function startGame() {
     // 每隔一段時間生成一個新的障礙物
     obstacleInterval = setInterval(createObstacle, 2000); // 每 1 秒生成一個新障礙物
 }
+
+export function pauseGame() {
+    if (!gameRunning) return;
+    
+    isPaused = true;
+    clearInterval(gameInterval);
+    clearInterval(obstacleInterval);
+    // 顯示暫停彈窗
+    
+}
+
+export function resumeGame() {
+    if (!gameRunning || !isPaused) return;
+    
+    isPaused = false;
+    
+    gameInterval = setInterval(gameLoop, 1000 / 60);
+    obstacleInterval = setInterval(createObstacle, 2000); // 每 1 秒生成一個新障礙物
+}
+// 全域函數：重新開始遊戲
+export function pauseRestartGame() {
+    // 重設遊戲狀態
+    isPaused = false;
+    score = 0;
+    passedObstacles = 0; // 重設通過的水管數量
+    gameCharacter.y = 50;  // 重設角色的Y坐標
+    gameCharacter.velocity = 0;
+    obstacles = [];
+    lives = 3;
+    obstacleSpeed = 3;
+    document.getElementById("score-status").textContent = score;
+    gameInterval = setInterval(gameLoop, 1000 / 60);
+    obstacleInterval = setInterval(createObstacle, 2000); // 每 1 秒生成一個新障礙物
+    // 隱藏遊戲結束畫面
+    const gameOverElement = document.getElementById("game-over");
+    gameOverElement.style.display = "none";
+    document.getElementById("container-bg").style.background = "#E7F3F9";
+
+    // 開始新的遊戲
+    startGame();
+}
+
 
 // 設置遊戲控制
 function setupControls() {
@@ -133,6 +187,7 @@ function handleTouchStart(e) {
 
 // 遊戲主循環
 function gameLoop() {
+    if (isPaused) return;
     updateGame();
     renderGame();
 }
@@ -159,12 +214,12 @@ function updateGame() {
 
     // 更新障礙物位置
     obstacles.forEach((obstacle, index) => {
-        obstacle.x -= 3; // 障礙物向左移動
-        if (obstacle.x + obstacle.width < 0) { // 若障礙物離開畫面，刪除
+        obstacle.x -= obstacleSpeed;
+        if (obstacle.x + obstacle.width < 0) {
             obstacles.splice(index, 1);
         }
     });
-
+    
     // 檢查玩家是否通過了障礙物，若是則增加分數
     obstacles.forEach(obstacle => {
         if (obstacle.x + obstacle.width < gameCharacter.x && !obstacle.passed) {
@@ -173,6 +228,14 @@ function updateGame() {
             document.getElementById("score-status").textContent = score;
         }
     });
+
+    if (score >= 10) {
+        document.getElementById("container-bg").style.background = "#1D2329";
+        obstacleSpeed = 5;
+    } else if (score >= 3) {
+        document.getElementById("container-bg").style.background = "linear-gradient(180deg, #EED1AB 0%, #FDB2B2 100%)";
+        obstacleSpeed = 4;
+    }
 
     checkGameOver();
 }
@@ -226,6 +289,9 @@ function renderGame() {
         // 繪製下水管
         ctx.drawImage(carrotImage, obstacle.x, canvas.height - obstacle.bottomHeight - grassHeight , obstacle.width, obstacle.bottomHeight);
     });
+    for (let i = 0; i < lives; i++) {
+        ctx.drawImage(heartImage, 10 + i * 35, 30, 30, 30);
+    }
 }
 
 // 停止遊戲邏輯
@@ -305,13 +371,16 @@ function submitScore(username, score) {
 // 全域函數：重新開始遊戲
 window.restartgame = function () {
     // 重設遊戲狀態
+    isPaused = false;
     score = 0;
     passedObstacles = 0; // 重設通過的水管數量
     gameCharacter.y = 50;  // 重設角色的Y坐標
     gameCharacter.velocity = 0;
     obstacles = [];
+    lives = 3;
+    obstacleSpeed = 3;
     document.getElementById("score-status").textContent = score;
-   
+  
     // 隱藏遊戲結束畫面
     const gameOverElement = document.getElementById("game-over");
     gameOverElement.style.display = "none";
@@ -328,19 +397,62 @@ window.closeGameOverBox = function() {
 
 // 設置遊戲結束的條件
 function checkGameOver() {
-    // 檢查是否碰到障礙物
     obstacles.forEach(obstacle => {
         if (gameCharacter.x + gameCharacter.width > obstacle.x &&
             gameCharacter.x < obstacle.x + obstacle.width &&
-            (gameCharacter.y < obstacle.topHeight || gameCharacter.y + gameCharacter.height > canvas.height - obstacle.bottomHeight - grassHeight)) {
-            stopGame();
+            (gameCharacter.y < obstacle.topHeight || 
+            gameCharacter.y + gameCharacter.height > canvas.height - obstacle.bottomHeight - grassHeight) && !isInvincible) {
+            
+            if(lives > 0){
+                // gameCharacter.image.src = gameCharacter.invincibleImage;
+                triggerCollision();
+                console.log(`撞擊！剩餘生命：${lives}`);
+                lives--;
+            } else{
+                stopGame();
+            }
         }
     });
 
-    // 檢查是否掉出畫面，碰到草地底部
-    if (gameCharacter.y + gameCharacter.height >= canvas.height - grassHeight) {
-        stopGame();
+    // 碰到地板時才真的結束遊戲
+    if (gameCharacter.y + gameCharacter.height >= canvas.height - grassHeight && !isInvincible) {
+       
+        if(lives > 0){
+            isInvincible = true; // 進入無敵狀態
+            // gameCharacter.image.src = gameCharacter.invincibleImage;
+            triggerCollision();
+            lives--;
+            console.log(`撞擊！剩餘生命：${lives}`);
+        } else{
+            stopGame();
+        }
     }
+}
+
+function triggerCollision() {
+    // 暫停遊戲1秒
+    clearInterval(gameInterval);
+    clearInterval(obstacleInterval);
+    gameRunning = false;
+    document.getElementById('resurrection').style.display = "block";
+    isInvincible = true;
+    setTimeout(() => {
+        gameCharacter.image.src = gameCharacter.invincibleImage;
+        document.getElementById('resurrection').style.display = "none";
+        if(gameCharacter.invincibleImage){
+            console.log("無敵狀態切換成功");
+        }
+        isInvincible = true;
+        gameRunning = true;
+        gameInterval = setInterval(gameLoop, 1000 / 60);
+        obstacleInterval = setInterval(createObstacle, 2000); // 每 1 秒生成一個新障礙物
+        // 3秒後結束無敵狀態
+        invincibilityTimer = setTimeout(() => {
+            isInvincible = false;
+            gameCharacter.image.src = gameCharacter.imageSrc;
+            console.log("取消無敵")
+        }, 3000);
+    }, 3000);
 }
 
 // 設置裝置控制方法

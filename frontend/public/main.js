@@ -1,5 +1,5 @@
 import { logout } from "./auth.js";
-import { startGame } from "./game.js";
+import { startGame, pauseGame, resumeGame, pauseRestartGame } from "./game.js";
 import { auth, db } from "./firebase-config.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 import { ref, get, set, update } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
@@ -13,17 +13,39 @@ window.addEventListener("load", () => {
   const openleaderboard = document.getElementById("leaderboard-icon");
   const viewLeaderboardButton = document.getElementById("viewleaderboard");
   const closeButtons = document.querySelectorAll('.lightbox .close-btn');
+  const pausebtn = document.getElementById("pause-btn");
+  const resumebtn = document.getElementById("pause-end-btn");
+  const restartBtn = document.getElementById("restart-btn");
 
   loginBtn.addEventListener("click", () => (window.location.href = "/login.html"));
   registerBtn.addEventListener("click", () => (window.location.href = "/register.html"));
   logoutBtn.addEventListener("click", logout);
-  startGameBtn.addEventListener("click", startGame);
+  startGameBtn.addEventListener("click", () => {
+    startGame(); // 開始遊戲
+    document.getElementById("login-out-section").style.display = "none";
+    document.getElementById("showscore-status").style.display = "block";
+    
+    pausebtn.style.display = "block";
+    document.getElementById("leaderboard-icon").style.display = "none";
+    
+  });
+  pausebtn.addEventListener("click", () =>{
+    pauseGame();
+    document.getElementById('pause-box').style.display = 'flex';
+  });
+  resumebtn.addEventListener("click", () =>{
+    resumeGame();
+    document.getElementById('pause-box').style.display = 'none';
+  });
+  restartBtn.addEventListener("click", () =>{
+    pauseRestartGame()
+    document.getElementById('pause-box').style.display = 'none';
+  });
   openleaderboard.addEventListener("click", showLeaderboard);
   viewLeaderboardButton.addEventListener("click", showLeaderboard);
   
   closeButtons.forEach(button => {
     button.addEventListener('click', () => {
-        // 這裡關閉的就是點擊的按鈕所在的父級 .lightbox 元素
         const lightbox = button.closest('.lightbox');
         if (lightbox) {
             lightbox.style.display = 'none';
@@ -31,16 +53,12 @@ window.addEventListener("load", () => {
     });
 });
 
-  // 檢查用戶登入狀態並更新 UI
   checkUserStatus();
 });
 
-// 打開排行榜
 async function showLeaderboard() {
-  // 顯示排行榜視窗
   document.getElementById("leaderboard-container").style.display = "flex";
 
-  // 清空舊的排行榜數據
   const leaderboardContainer = document.getElementById("10_rank");
   leaderboardContainer.innerHTML = ""; // 清空之前顯示的排行榜
   
@@ -65,6 +83,7 @@ export function checkUserStatus() {
     const logoutBtn = document.getElementById("logout-btn");
     const characterSelection = document.getElementById("character-selection");
     const userhighScore = document.getElementById("score-highscore");
+    const loginDescript = document.getElementById("login-description");
     if (user) {
       // 如果用戶已登入，顯示用戶的頭像和分數
       const userRef = ref(db, "users/" + user.uid);
@@ -82,7 +101,10 @@ export function checkUserStatus() {
             if (userStatusElement) {
               userStatusElement.innerHTML = `
                             <img src="${avatarUrl}" alt="avatar" id="user-avator" onclick="openProfileModal()"> 
-                            <span>已登入: ${username}</span>
+                            <div>
+                              <span>已登入: ${username}</span>
+                              <span>BEST: <span class="userhighscore"></span> </span>
+                            <div>
                         `;
             }
 
@@ -111,14 +133,14 @@ export function checkUserStatus() {
             registerBtn.style.display = "none";
             logoutBtn.style.display = "block";
             characterSelection.style.display = "block";
-            
+            loginDescript.style.display = "none";
 
             const isNewUser = userData.isNewUser;
 
             if (isNewUser === true) {
               // 顯示提示訊息
               const hint = document.createElement("div");
-              hint.innerText = "點擊頭像選擇頭像！";
+              hint.innerHTML = `<p class="icon_arrow">點擊選擇頭像</p>`;
               hint.id = "avatar-hint";
               userStatusElement.appendChild(hint);
               console.log("hint顯示");
@@ -144,7 +166,10 @@ export function checkUserStatus() {
       if (userStatusElement) {
         userStatusElement.innerHTML = `
                     <img src="./src/img/avator_pocky.png" alt="avatar" id="user-avator" onclick="openProfileModal()"> 
+                    <div>
                     <span>未登入</span>
+                    <span>BEST: <span class="userhighscore"></span> </span>
+                    </div>
                 `;
       }
       startGameBtn.style.display = "none";
@@ -152,6 +177,7 @@ export function checkUserStatus() {
       registerBtn.style.display = "block";
       logoutBtn.style.display = "none";
       characterSelection.style.display = "none";
+      loginDescript.style.display = "block";
     }
   });
 }

@@ -3,9 +3,23 @@ import { auth } from "./firebase-config.js";
 
 const db = getDatabase();
 const leaderboardRef = ref(db, "leaderboard");
+const usersRef = ref(db, "users");
 
 const leaderboardContainer = document.getElementById("10_rank");
 const userRankContainer = document.querySelector(".user_rank");
+
+async function getUserAvatar(uid) {
+    try {
+        const userSnapshot = await get(ref(db, `users/${uid}`));
+        if (userSnapshot.exists()) {
+            return userSnapshot.val().avatarUrl || "./src/img/avator_pocky.png";
+        }
+        return "./src/img/avator_pocky.png";
+    } catch (error) {
+        console.error("Error fetching user avatar:", error);
+        return "./src/img/avator_pocky.png";
+    }
+}
 
 // 獲取前 20 名玩家的排行榜
 export async function fetchLeaderboard() {
@@ -13,18 +27,58 @@ export async function fetchLeaderboard() {
     const snapshot = await get(leaderboardQuery);
     
     if (snapshot.exists()) {
-        const leaderboardData = Object.entries(snapshot.val())  // 這會取得 {username: {highscore, uid}} 的結構
-            .map(([username, data]) => ({ username, ...data }))  // 添加 username 作為欄位
-            .sort((a, b) => b.highscore - a.highscore);  // 按 highscore 排序
+        // 使用 Promise.all 異步獲取每個玩家的頭像
+        const leaderboardData = await Promise.all(
+            Object.entries(snapshot.val())
+                .map(async ([username, data]) => ({ 
+                    username, 
+                    ...data,
+                    avatar: await getUserAvatar(data.uid)
+                }))
+        );
         
-        leaderboardContainer.innerHTML = "";  // 清空現有的排行榜
+        // 排序
+        const sortedLeaderboard = leaderboardData
+            .sort((a, b) => b.highscore - a.highscore)
+            .slice(0, 20);
         
-        leaderboardData.forEach((player, index) => {
-            const playerElement = document.createElement("div");
-            playerElement.classList.add("leaderboard-item");
-            playerElement.innerHTML = `<span>#${index + 1}</span> ${player.username} - ${player.highscore} 分`;
-            leaderboardContainer.appendChild(playerElement);
+        leaderboardContainer.innerHTML = ""; // 清空現有的排行榜
+        
+        // 前三名的 div
+        const topThreeDiv = document.createElement("div");
+        topThreeDiv.classList.add("top-three");
+        
+        // 其他排名的 div
+        const otherRanksDiv = document.createElement("div");
+        otherRanksDiv.classList.add("other-ranks");
+        
+        sortedLeaderboard.forEach((player, index) => {
+            const playerHTML = `
+                <div class="leaderboard-item">
+                    <div class="player_left">
+                        <span class="player-rank">${index + 1}</span>
+                        <span class="player-info">
+                            <img src="${player.avatar}" alt="${player.username}'s avatar" class="player-avatar">
+                            ${player.username}
+                        </span>
+                    </div>
+                    <span class="player-score">${player.highscore} 分</span>
+                </div>
+            `;
+            
+            // 前三名加到 topThreeDiv
+            if (index < 3) {
+                topThreeDiv.innerHTML += playerHTML;
+            } 
+            // 其他排名加到 otherRanksDiv
+            else {
+                otherRanksDiv.innerHTML += playerHTML;
+            }
         });
+        
+        // 將兩個 div 加入主容器
+        leaderboardContainer.appendChild(topThreeDiv);
+        leaderboardContainer.appendChild(otherRanksDiv);
     }
 }
 
@@ -33,17 +87,40 @@ export async function fetchLeaderboard() {
 export async function fetchUserRank() {
     const snapshot = await get(leaderboardRef);
     if (snapshot.exists() && auth.currentUser) {
-        const leaderboardData = Object.entries(snapshot.val())  // 這會取得 {username: {highscore, uid}} 的結構
-            .map(([username, data]) => ({ username, ...data }))  // 添加 username 作為欄位
-            .sort((a, b) => b.highscore - a.highscore);  // 按 highscore 排序
-
         const userId = auth.currentUser.uid;
-        const userIndex = leaderboardData.findIndex(player => player.uid === userId);  // 使用 uid 來對比
+
+        // 獲取當前用戶的頭像
+        const userSnapshot = await get(ref(db, `users/${userId}`));
+        const userAvatar = userSnapshot.exists() 
+            ? userSnapshot.val().avatarUrl || "./src/img/default-avatar.png"
+            : "./src/img/default-avatar.png";
+
+        const leaderboardData = Object.entries(snapshot.val())
+            .map(([username, data]) => ({ username, ...data }))
+            .sort((a, b) => b.highscore - a.highscore);
+
+        const userIndex = leaderboardData.findIndex(player => player.uid === userId);
         
         if (userIndex !== -1) {
-            userRankContainer.innerHTML = `<p>你的排名: #${userIndex + 1} - ${leaderboardData[userIndex].username} - ${leaderboardData[userIndex].highscore} 分</p>`;
+            const userRankHTML = `
+                <div class="user-rank-item">
+                    <div class="player_left">
+                        <span class="player-rank">${userIndex + 1}</span>
+                        <span class="player-info">
+                            <img src="${userAvatar}" alt="Your avatar" class="player-avatar">
+                            ${leaderboardData[userIndex].username}
+                        </span>
+                    </div>
+                    <span class="player-score">${leaderboardData[userIndex].highscore} 分</span>
+                </div>
+            `;
+            userRankContainer.innerHTML = userRankHTML;
         } else {
-            userRankContainer.innerHTML = `<p>你還沒有上榜哦，快來挑戰吧！</p>`;
+            userRankContainer.innerHTML = `
+                <div class="user-rank-item not-ranked">
+                    <p>你還沒有上榜哦，快來挑戰吧！</p>
+                </div>
+            `;
         }
     }
 }

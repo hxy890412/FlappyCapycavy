@@ -4,32 +4,39 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <title>Flappy Capy & Cavy</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./src/style.css">
     <link rel="stylesheet" href="./src/reset.css">
-
 </head>
 
 <body>
     <div class="FlappyCapyCavy_Game">
-        <div class="container">
+        <div class="container" id="container-bg">
             <div id="navbar">
                 <span id="user-status" class="user-status"></span>  <!-- 顯示頭像或帳號 -->
-                <span>最高分數: <span class="userhighscore"></span> </span>  <!-- 顯示分數 -->
-                
                 <span id="leaderboard-icon"></span>
+                <img src="./src/img/pause.png" alt="pasue" id="pause-btn" style="display:none;cursor: pointer;">
+            </div>
+            <div id="pause-box" style="display: none;">
+                <img src="./src/img/start.png" alt="" id="pause-end-btn" style="cursor: pointer;" >
+                <img src="./src/img/restart.png" alt="" id="restart-btn" style="cursor: pointer;" >
             </div>
             <span style="display: none;"id="showscore-status"><span id="score-status"></span> </span>  <!-- 顯示分數 -->
             <!-- 起始畫面 -->
             <div class="default_page" id="login-out-section">
                 <div id="game-logo">
-                    <h1>Flappy Capy & Cavy</h1>
+                    <h1>Flappy<br>CapyCavy</h1>
                 </div>
-                <p id="game-description">幫助鼠鼠避開障礙物吧！輕觸螢幕即可跳高！加油</p>
+                <p id="login-description" style="display:none">請登入進行遊玩！</p>
                 <div class="game_btn_box">
                     <!-- 登入後顯示的按鈕 -->
                     <div id="character-selection" style="display: none;">
-                        <img src="./src/img/machi.png" alt="machi" id="choose-machi">
-                        <img src="./src/img/pocky.png" alt="pocky" id="choose-capybara">
+                        <p id="game-description">幫助鼠鼠避開障礙物吧！輕觸螢幕即可跳高！加油</p>
+                        <p>請選擇遊玩角色</p>
+                        <img src="./src/img/machi_select.png" alt="machi" id="choose-machi">
+                        <img src="./src/img/pocky_unselect.png" alt="pocky" id="choose-capybara">
                       </div>
                     <button id="start-game-btn" style="display:none" >開始遊玩</button>
                     <button id="logout-btn"style="display:none" >登出</button>
@@ -41,6 +48,7 @@
             <!-- 遊戲內容畫面 -->
             <div class="game_container" id="game-container">
                 <canvas id="gameCanvas"></canvas>
+                <h3 class="resurrection" id="resurrection" style="display: none;">復活中</h3>
             </div>
             
         </div>
