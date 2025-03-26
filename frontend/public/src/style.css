@@ -1,8 +1,106 @@
+/* 通用 */
+@font-face {
+  font-family: Cubic;
+  src:
+  local("Cubic-11"),
+  url(./font/Cubic_11.woff2) format("woff2"),
+  url(./font/Cubic_11.woff) format("woff")
+}
+
+:root{
+  --primary-brown:#67554F;
+  --Dark-brown:#433733;
+  --bg-brown:#ECE7E1;
+  --secondary:#FFB700;
+  --red:#E03737;
+  --orange:#FF6422;
+  --bg-y:#FFF4E7;
+}
+
+/* 文字通用 */
+*{
+  font-family: "Press Start 2P", system-ui; /* 設定字型 */
+  font-weight: 400;
+  font-style: normal;
+  font-size: 10px;
+  line-height: 16px;
+}
+.Cubic{
+  font-family: 'Cubic', system-ui, -apple-system, sans-serif;
+  font-size: 16px;
+}
+.fz-8{font-size: 9;}
+.fz-9{font-size: 9px;}
+.fz-10{font-size: 10px;}
+.fz-12{font-size: 12px;}
+.fz-14{font-size: 14px;}
+.fz-16{font-size: 16px;}
+.fz-18{font-size: 18px;}
+.fz-20{font-size: 20px;}
+
+.lh-24{line-height: 24px;}
+.lh-150{line-height: 1.5;}
+
+.ls-35{letter-spacing:0.35em;}
+
+.color-y{color: var(--secondary);}
+.color-pb{color: var(--primary-brown);}
+.color-db{color: var(--Dark-brown);}
+.color-white{color: #FFF;}
+
+.pixel_lightbox{
+  box-shadow: -8px 0px 0px var(--primary-brown),
+  8px 0px 0px var(--primary-brown),
+  0px -8px 0px var(--primary-brown),
+  0px 8px 0px var(--primary-brown);
+  border: 5px solid var(--Dark-brown);
+  background: var(--bg-y);
+}
+
+.stroke_text{
+  color: white;
+  -webkit-text-stroke: 8px var(--Dark-brown);
+  paint-order: stroke fill;
+}
+/* layout */
+.d-flex{display: flex;}
+.flex-col{flex-direction: column;}
+.gap-24{gap: 24px;}
+.gap-16{gap: 16px;}
+.gap-8{gap: 8px;}
+.gap-4{gap: 4px;}
+.jc-c{justify-content: center;}
+.al-c{align-items: center;}
+
+/* btn */
+button{
+  width: 100%;
+  max-width: 200px;
+  padding: 8px 20px;
+  background: var(--secondary);
+  border: 2px solid #FFFFFF;
+  box-shadow: 0px 4px 4px rgba(103, 85, 79, 0.4), 0px 0px 0px 2px #413531;
+  color: white;
+  -webkit-text-stroke: 4px var(--Dark-brown);
+  paint-order: stroke fill;
+  line-height: 24px;
+  font-size: 14px;
+  letter-spacing: 0.12em;
+}
+button#register-btn{
+  background:var(--primary-brown);
+}
+button#logout-btn{
+  background: var(--red);
+}
+button#viewleaderboard{
+  background: var(--orange);
+}
+
 body {
   width: 100%;
-  height: 100vh;
+  height: 100dvh;
   overflow: hidden;
-  font-family: "Press Start 2P", system-ui; /* 設定字型 */
   background-color: #ECE7E1; /* 淺灰色背景 */
   margin: 0;
   padding: 0;
@@ -13,11 +111,21 @@ body *{
   font-style: normal;
 }
 
-
 h1 {
   text-align: center;
   color: #333; /* 深灰色 */
   font-size: 20px;
+}
+
+/* navbar */
+.pixel_box_primary{
+  box-shadow: -2px 0px 0px var(--primary-brown),
+  2px 0px 0px var(--primary-brown),
+  0px -2px 0px var(--primary-brown),
+  0px 2px 0px var(--primary-brown);
+  background-color: var(--primary-brown);
+  letter-spacing: 0.12em;
+  padding: 0 8px;
 }
 
 /* 登入註冊 */
@@ -42,50 +150,18 @@ input {
   font-size: 16px;
 }
 
-/* 按鈕樣式 */
-button {
-  width: 100%;
-  padding: 12px;
-  margin: 10px 0;
-  display: block;
-  background-color: #e0d5d2; /* 綠色背景 */
-  color: #413531;
-  border: 2px solid #413531;
-  border-radius: 0px;
-  font-size: 18px;
-  cursor: pointer;
-}
 
-/* 按鈕懸停效果 */
-button:hover {
-  background-color: #d0c1bc; /* 當鼠標懸停時，顏色稍微變暗 */
-}
-
-/* 登入註冊按鈕樣式 */
-button#registerBtn, button#loginBtn {
-  background-color: #008CBA; /* 藍色背景 */
-}
-
-button#registerBtn:hover, button#loginBtn:hover {
-  background-color: #007B9E; /* 藍色按鈕懸停效果 */
-}
 
 #user-status {
-  font-size: 16px;
-  line-height: 40px;
-  color: #FFF;
   position: relative;
-  display: inline-block;
-  padding: 4px 8px 4px 55px;
+  display: flex;
+  padding: 4px 0px;
+  gap: 8px;
 }
 
 #user-avator{
-  position: absolute;
-  left: 0;
   width: 50px;
   height: 50px;
-  top: 50%;
-  transform: translateY(-50%);
 }
 
 /* 頂部導航欄 */
@@ -110,7 +186,7 @@ button#registerBtn:hover, button#loginBtn:hover {
   height: 50px;
   position: absolute;
   right: 8px;
-  top: 4px;
+  top: 8px;
 }
 
 /* 屏幕右側的LOGO */
@@ -121,37 +197,6 @@ button#registerBtn:hover, button#loginBtn:hover {
   color: #4CAF50;
 }
 
-/* 開始遊戲按鈕樣式 */
-#start-game-btn {
-  text-align: center;
-  background-color: #FF5722;
-  color: white;
-  font-size: 24px;
-  border: none;
-  padding: 15px 30px;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-#start-game-btn:hover {
-  background-color: #e64a19;
-}
-
-/* 登出按鈕樣式 */
-#logout-btn {
-  display: none; /* 初始隱藏 */
-  background-color: #f44336; /* 紅色背景 */
-  color: white;
-  font-size: 18px;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-#logout-btn:hover {
-  background-color: #e53935;
-}
 
 .FlappyCapyCavy_Game{
   width: 100%;
@@ -186,7 +231,7 @@ button#registerBtn:hover, button#loginBtn:hover {
   display: flex;
   gap: 12px;
   justify-content: flex-start;
-  padding: 4px 8px;
+  padding: 8px;
   z-index: 2;
   align-items: center;
 }
@@ -319,6 +364,6 @@ button#registerBtn:hover, button#loginBtn:hover {
 #avatar-hint{
   position: absolute;
   height: 20px;
-  bottom: -40px;
+  bottom: -20px;
   left: 4px;
 }

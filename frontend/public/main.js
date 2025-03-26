@@ -31,15 +31,12 @@ window.addEventListener("load", () => {
   });
   pausebtn.addEventListener("click", () =>{
     pauseGame();
-    document.getElementById('pause-box').style.display = 'flex';
   });
   resumebtn.addEventListener("click", () =>{
     resumeGame();
-    document.getElementById('pause-box').style.display = 'none';
   });
   restartBtn.addEventListener("click", () =>{
     pauseRestartGame()
-    document.getElementById('pause-box').style.display = 'none';
   });
   openleaderboard.addEventListener("click", showLeaderboard);
   viewLeaderboardButton.addEventListener("click", showLeaderboard);
@@ -101,9 +98,9 @@ export function checkUserStatus() {
             if (userStatusElement) {
               userStatusElement.innerHTML = `
                             <img src="${avatarUrl}" alt="avatar" id="user-avator" onclick="openProfileModal()"> 
-                            <div>
-                              <span>已登入: ${username}</span>
-                              <span>BEST: <span class="userhighscore"></span> </span>
+                            <div class="d-flex flex-col gap-4 jc-c">
+                              <span class="Cubic color-db fz-12">${username}</span>
+                              <span class="pixel_box_primary fz-9 color-white">BEST: <span class="userhighscore fz-9 color-y"></span> </span>
                             <div>
                         `;
             }
@@ -125,14 +122,11 @@ export function checkUserStatus() {
                let highscore = 0;
            });
 
-
-           
-
             startGameBtn.style.display = "block";
             loginBtn.style.display = "none";
             registerBtn.style.display = "none";
             logoutBtn.style.display = "block";
-            characterSelection.style.display = "block";
+            characterSelection.style.display = "flex";
             loginDescript.style.display = "none";
 
             const isNewUser = userData.isNewUser;
@@ -140,7 +134,7 @@ export function checkUserStatus() {
             if (isNewUser === true) {
               // 顯示提示訊息
               const hint = document.createElement("div");
-              hint.innerHTML = `<p class="icon_arrow">點擊選擇頭像</p>`;
+              hint.innerHTML = `<p class="icon_arrow color-db fz-10">點擊選擇頭像</p>`;
               hint.id = "avatar-hint";
               userStatusElement.appendChild(hint);
               console.log("hint顯示");
@@ -166,9 +160,9 @@ export function checkUserStatus() {
       if (userStatusElement) {
         userStatusElement.innerHTML = `
                     <img src="./src/img/avator_pocky.png" alt="avatar" id="user-avator" onclick="openProfileModal()"> 
-                    <div>
-                    <span>未登入</span>
-                    <span>BEST: <span class="userhighscore"></span> </span>
+                    <div class="d-flex flex-col gap-4 jc-c">
+                    <span class="Cubic color-db fz-12">未登入</span>
+                    <span class="pixel_box_primary fz-9 color-white">BEST: <span class="userhighscore fz-9 color-y"></span> </span>
                     </div>
                 `;
       }

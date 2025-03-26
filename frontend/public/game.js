@@ -4,19 +4,20 @@ import { ref, get, set, update } from "https://www.gstatic.com/firebasejs/9.6.1/
 
 let canvas, ctx;
 let gameInterval;  // 用來儲存遊戲的定時器 ID
-let obstacleInterval; 
+let obstacleInterval; //生成障礙物
 let score = 0;     // 記錄當前分數
 let gameRunning = false;  // 遊戲是否正在運行
 let grassHeight = 150;  // 草地高度
 let lives = 3; // 生命數量
-let obstacleSpeed = 3;
-let isPaused = false;
-let isInvincible = false;
-let invincibilityTimer = null;
+let obstacleSpeed = 3; // 障礙物速度
+let isPaused = false; //是否暫停遊戲中
+let isInvincible = false; //是否無敵模式
+let invincibilityTimer = null; 
+let isResurrecting = false; // 判斷是否復活中（為了設定復活中不可以按暫停和重啟
 
 let gameCharacter = {
     x: 50,     // 角色的 X 坐標
-    y: 60,     // 角色的 Y 坐標
+    y: 100,     // 角色的 Y 坐標
     width: 50,  // 角色寬度
     height: 41, // 角色高度
     speed: 3,   // 角色跳躍速度
@@ -56,6 +57,11 @@ function initCanvas() {
     // 監聽窗口大小變化
     window.addEventListener("resize", resizeCanvas);
     renderGame();
+    // 重置為預設的 Machi 角色
+    gameCharacter.imageSrc = "./src/img/machi.png";
+    gameCharacter.invincibleImage = "./src/img/machi_invincible.png";
+    gameCharacter.image.src = gameCharacter.imageSrc;
+    
     // 角色選擇邏輯
     const chooseMachi = document.getElementById("choose-machi");
     const chooseCapybara = document.getElementById("choose-capybara");
@@ -96,34 +102,46 @@ function resizeCanvas() {
 // 設置遊戲開始邏輯
 export function startGame() {
     if (gameRunning) return; // 防止重複啟動遊戲
-    // 重設遊戲狀態
-    isPaused = false;
-    score = 0;
-    passedObstacles = 0; // 重設通過的水管數量
-    gameCharacter.y = 60;  // 重設角色的Y坐標
-    gameCharacter.velocity = 0;
-    obstacles = [];
-    lives = 3; // 重置生命值
+
+     // 清除所有可能存在的定時器
+     clearInterval(gameInterval);
+     clearInterval(obstacleInterval);
+     if (invincibilityTimer) {
+         clearTimeout(invincibilityTimer);
+     }
+
+     // 重設遊戲狀態
+     isPaused = false;
+     score = 0;
+     passedObstacles = 0; 
+     gameCharacter.y = 100;  
+     gameCharacter.velocity = 0;
+     gameCharacter.image.src = gameCharacter.imageSrc;
+     obstacles = [];
+     lives = 3; 
+     obstacleSpeed = 3;
+
+    // 更新UI
     document.getElementById("score-status").textContent = score;
     document.getElementById("container-bg").style.background = "#E7F3F9";
     // 設置遊戲控制
     setupControls();
 
     gameRunning = true;
-    gameInterval = setInterval(gameLoop, 1000 / 60); // 每秒 60 幀，開始遊戲循環
-    
-    // 每隔一段時間生成一個新的障礙物
-    obstacleInterval = setInterval(createObstacle, 2000); // 每 1 秒生成一個新障礙物
+    gameInterval = setInterval(gameLoop, 1000 / 60); 
+    obstacleInterval = setInterval(createObstacle, 2000); 
 }
 
 export function pauseGame() {
+    if (isResurrecting) return;
     if (!gameRunning) return;
     
     isPaused = true;
     clearInterval(gameInterval);
     clearInterval(obstacleInterval);
+
     // 顯示暫停彈窗
-    
+    document.getElementById('pause-box').style.display = 'flex';
 }
 
 export function resumeGame() {
@@ -132,58 +150,63 @@ export function resumeGame() {
     isPaused = false;
     
     gameInterval = setInterval(gameLoop, 1000 / 60);
-    obstacleInterval = setInterval(createObstacle, 2000); // 每 1 秒生成一個新障礙物
+    obstacleInterval = setInterval(createObstacle, 2000); 
+
+    document.getElementById('pause-box').style.display = 'none';
 }
 // 全域函數：重新開始遊戲
 export function pauseRestartGame() {
-    // 重設遊戲狀態
+    if (isResurrecting) return;
+
+    // 先停止所有現有的定時器
+    clearInterval(gameInterval);
+    clearInterval(obstacleInterval);
+    
+    // 清除無敵狀態相關的定時器
+    if (invincibilityTimer) {
+        clearTimeout(invincibilityTimer);
+    }
+
+    // 重設所有遊戲狀態
+    gameRunning = false;
     isPaused = false;
+    isInvincible = false;
+
+    // 重置遊戲參數
     score = 0;
-    passedObstacles = 0; // 重設通過的水管數量
-    gameCharacter.y = 50;  // 重設角色的Y坐標
-    gameCharacter.velocity = 0;
-    obstacles = [];
+    passedObstacles = 0;
     lives = 3;
     obstacleSpeed = 3;
+
+    // 重置角色位置和速度
+    gameCharacter.y = 50;
+    gameCharacter.velocity = 0;
+    gameCharacter.image.src = gameCharacter.imageSrc;
+
+    // 清空障礙物
+    obstacles = [];
+
+    // 更新UI
     document.getElementById("score-status").textContent = score;
-    gameInterval = setInterval(gameLoop, 1000 / 60);
-    obstacleInterval = setInterval(createObstacle, 2000); // 每 1 秒生成一個新障礙物
-    // 隱藏遊戲結束畫面
-    const gameOverElement = document.getElementById("game-over");
-    gameOverElement.style.display = "none";
     document.getElementById("container-bg").style.background = "#E7F3F9";
 
-    // 開始新的遊戲
+    // 隱藏遊戲結束畫面（如果是從遊戲結束畫面重新開始）
+    const gameOverElement = document.getElementById("game-over");
+    if (gameOverElement) {
+        gameOverElement.style.display = "none";
+    }
+
+    document.getElementById('pause-box').style.display = 'none';
+
+    // 重新設置控制
+    setupControls();
+
+    // 重新開始遊戲
     startGame();
 }
 
 
-// 設置遊戲控制
-function setupControls() {
-    // 移除之前的事件監聽器
-    window.removeEventListener("keydown", handleKeyDown);
-    window.removeEventListener("touchstart", handleTouchStart);
 
-    // 重新設置控制方式
-    if (controlMethod === "keyboard") {
-        window.addEventListener("keydown", handleKeyDown);
-    } else if (controlMethod === "touch") {
-        canvas.addEventListener("touchstart", handleTouchStart);
-    }
-}
-
-// 鍵盤控制
-function handleKeyDown(e) {
-    if (e.key === " " || e.key === "ArrowUp") {  // 空格或上箭頭鍵
-        gameCharacter.velocity = -7; // 跳躍
-    }
-}
-
-// 觸控控制
-function handleTouchStart(e) {
-    e.preventDefault();
-    gameCharacter.velocity = -7; // 跳躍
-}
 
 // 遊戲主循環
 function gameLoop() {
@@ -290,7 +313,7 @@ function renderGame() {
         ctx.drawImage(carrotImage, obstacle.x, canvas.height - obstacle.bottomHeight - grassHeight , obstacle.width, obstacle.bottomHeight);
     });
     for (let i = 0; i < lives; i++) {
-        ctx.drawImage(heartImage, 10 + i * 35, 30, 30, 30);
+        ctx.drawImage(heartImage, 10 + i * 28, 66, 24, 24);
     }
 }
 
@@ -430,6 +453,8 @@ function checkGameOver() {
 }
 
 function triggerCollision() {
+    isResurrecting = true;
+
     // 暫停遊戲1秒
     clearInterval(gameInterval);
     clearInterval(obstacleInterval);
@@ -445,7 +470,8 @@ function triggerCollision() {
         isInvincible = true;
         gameRunning = true;
         gameInterval = setInterval(gameLoop, 1000 / 60);
-        obstacleInterval = setInterval(createObstacle, 2000); // 每 1 秒生成一個新障礙物
+        obstacleInterval = setInterval(createObstacle, 2000);
+        isResurrecting = false; // 復活結束
         // 3秒後結束無敵狀態
         invincibilityTimer = setTimeout(() => {
             isInvincible = false;
@@ -453,6 +479,33 @@ function triggerCollision() {
             console.log("取消無敵")
         }, 3000);
     }, 3000);
+}
+
+// 設置遊戲控制
+function setupControls() {
+    // 移除之前的事件監聽器
+    window.removeEventListener("keydown", handleKeyDown);
+    window.removeEventListener("touchstart", handleTouchStart);
+
+    // 重新設置控制方式
+    if (controlMethod === "keyboard") {
+        window.addEventListener("keydown", handleKeyDown);
+    } else if (controlMethod === "touch") {
+        canvas.addEventListener("touchstart", handleTouchStart);
+    }
+}
+
+// 鍵盤控制
+function handleKeyDown(e) {
+    if (e.key === " " || e.key === "ArrowUp") {  // 空格或上箭頭鍵
+        gameCharacter.velocity = -7; // 跳躍
+    }
+}
+
+// 觸控控制
+function handleTouchStart(e) {
+    e.preventDefault();
+    gameCharacter.velocity = -7; // 跳躍
 }
 
 // 設置裝置控制方法
