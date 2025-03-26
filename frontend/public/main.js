@@ -196,7 +196,7 @@ window.openProfileModal = function () {
 
         // 更新 lightbox 顯示的資料
         document.getElementById("profile-avatar").src = avatarUrl;
-        document.getElementById("profile-username").innerText = `Username: ${originalUsername}`;
+        document.getElementById("profile-username").innerText = `${originalUsername}`;
       }
     })
     .catch((error) => {

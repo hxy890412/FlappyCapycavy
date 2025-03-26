@@ -1,3 +1,47 @@
+// document.addEventListener('DOMContentLoaded', function() {
+//     function isMobileDevice() {
+//         return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
+//                window.innerWidth <= 768;
+//     }
+
+//     if (!isMobileDevice()) {
+//         document.body.innerHTML = ''; 
+//         document.body.style.margin = '0';
+//         document.body.style.padding = '0';
+//         document.body.style.height = '100vh';
+//         document.body.style.backgroundColor = '#ffffff';
+
+//         const mobileOverlay = document.createElement('div');
+//         mobileOverlay.innerHTML = `
+//             <div style="
+//                 background: #ffdcdc;
+//                 position: fixed;
+//                 top: 0;
+//                 left: 0;
+//                 width: 100%;
+//                 height: 100%;
+//                 display: flex;
+//                 flex-direction: column;
+//                 align-items: center;
+//                 justify-content: center;
+//                 padding: 20px;
+//                 text-align: center;
+//                 font-family: Arial, sans-serif;
+//             ">
+//                 <img src="./src/img/machi.png" alt="Game Logo" style="width: 150px; margin-bottom: 20px;">
+//                 <h1 style="font-size: 24px; margin-bottom: 20px; color: #333;">請使用手機開啟遊戲</h1>
+//                 <p style="font-size: 18px; margin-bottom: 20px; color: #666;">本遊戲僅支援手機版本</p>
+//                 <p style="font-size: 16px; color: #888;">請使用手機瀏覽器開啟</p>
+//             </div>
+//         `;
+
+//         document.body.appendChild(mobileOverlay);
+      
+//         return; 
+//     }
+// });
+
+
 // game.js
 import { auth, db } from './firebase-config.js';
 import { ref, get, set, update } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
@@ -51,7 +95,7 @@ function initCanvas() {
     ctx = canvas.getContext("2d");
 
     canvas.width = window.innerWidth;   // 設置畫布的寬度為螢幕寬度
-    canvas.height = window.innerHeight * 0.99; 
+    canvas.height = window.innerHeight; 
     // 設置Canvas大小為視窗大小
     resizeCanvas();
     // 監聽窗口大小變化
@@ -96,7 +140,7 @@ function initCanvas() {
 // 設置Canvas大小
 function resizeCanvas() {
     canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight * 0.99;
+    canvas.height = window.innerHeight;
 }
 
 // 設置遊戲開始邏輯
@@ -221,8 +265,8 @@ function updateGame() {
     gameCharacter.y += gameCharacter.velocity; // 更新 Y 坐標
 
     // 限制角色不會跳出畫面，保持在固定範圍內
-    if (gameCharacter.y > canvas.height - gameCharacter.height - 100) {
-        gameCharacter.y = canvas.height - gameCharacter.height - 100;
+    if (gameCharacter.y > canvas.height - gameCharacter.height - grassHeight) {
+        gameCharacter.y = canvas.height - gameCharacter.height - grassHeight;
         gameCharacter.velocity = 0;
     } else if (gameCharacter.y < 0) {  // 確保角色不會飛出畫面上方
         gameCharacter.y = 0;

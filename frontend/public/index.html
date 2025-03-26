@@ -75,13 +75,14 @@
     <!-- 排行榜 -->
      <div class="lightbox leaderboard" id="leaderboard-container" style="display: none;">
         <div class="lightbox-content">
-            <div id="10_rank">
+            <button class="close-btn btn_fixed">X</button>
+            <div id="10_rank" class="playrank">
             
             </div>
             <div class="user_rank">
 
             </div>
-            <button class="close-btn btn_fixed">X</button>
+            
         </div>
        
      </div>
@@ -90,11 +91,11 @@
     <div id="profile-modal" class="lightbox" style="display: none;">
         <div class="lightbox-content">
             <div class="profile-info">
-                <div>
+                <div class="d-flex gap-8 al-c jc-c">
                     <img id="profile-avatar" src="./src/img/avator_pocky.png" alt="avatar" />
-                    <div>
+                    <div class="d-flex flex-col gap-4">
                         <p id="profile-username">Username: </p>
-                        <p>最高分數: <span class="userhighscore"></span></p>
+                        <p>BEST: <span class="userhighscore"></span></p>
                     </div>
                 </div>
             </div>
@@ -102,7 +103,7 @@
                 <img src="./src/img/avator_machi.png" alt="avatar1" class="avatar-option" onclick="selectNewAvatar('/src/img/avator_machi.png')" />
                 <img src="./src/img/avator_pocky.png" alt="avatar2" class="avatar-option" onclick="selectNewAvatar('/src/img/avator_pocky.png')" />
             </div>
-            <button class="close-btn">關閉</button>
+            <button class="close-btn">CLOSE</button>
         </div>
     </div>
     <script type="module" src="firebase-config.js"></script>
