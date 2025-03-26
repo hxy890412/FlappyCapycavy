@@ -90,23 +90,28 @@ export function checkUserStatus() {
           if (snapshot.exists()) {
             const userData = snapshot.val();
             console.log("用戶資料:", userData); // 輸出用戶資料以檢查是否正確
-            const username = userData.username;
+
+              // 使用原始用戶名顯示，使用安全用戶名查詢
+            const originalUsername = userData.originalUsername || userData.username;
+            const safeUsername = userData.username;
             const avatarUrl = userData.avatarUrl || "./src/img/avator_pocky.png"; // 預設頭像
 
             // 更新 UI，顯示用戶名稱和頭像
             const userStatusElement = document.getElementById("user-status");
+
             if (userStatusElement) {
               userStatusElement.innerHTML = `
                             <img src="${avatarUrl}" alt="avatar" id="user-avator" onclick="openProfileModal()"> 
                             <div class="d-flex flex-col gap-4 jc-c">
-                              <span class="Cubic color-db fz-12">${username}</span>
+                              <span class="Cubic color-db fz-12">${originalUsername}</span>
                               <span class="pixel_box_primary fz-9 color-white">BEST: <span class="userhighscore fz-9 color-y"></span> </span>
                             <div>
                         `;
             }
 
            // **從 leaderboard/$username 取得 highscore**
-           const leaderboardRef = ref(db, "leaderboard/" + username);
+           const leaderboardRef = ref(db, "leaderboard/" + safeUsername);
+
            get(leaderboardRef).then((leaderboardSnapshot) => {
                let highscore = 0;
                if (leaderboardSnapshot.exists()) {
@@ -186,13 +191,12 @@ window.openProfileModal = function () {
       if (snapshot.exists()) {
         const userData = snapshot.val();
         const avatarUrl = userData.avatarUrl || "./src/img/avator_pocky.png";
-        const username = userData.username;
+        const originalUsername = userData.originalUsername || userData.username;
         const highscore = userData.highscore || 0; // 用戶的最高分數
 
         // 更新 lightbox 顯示的資料
         document.getElementById("profile-avatar").src = avatarUrl;
-        document.getElementById("profile-username").innerText = `Username: ${username}`;
-        // document.getElementById("profile-highscore").innerText = `最高分數: ${highscore}`;
+        document.getElementById("profile-username").innerText = `Username: ${originalUsername}`;
       }
     })
     .catch((error) => {

@@ -30,11 +30,19 @@ export async function fetchLeaderboard() {
         // 使用 Promise.all 異步獲取每個玩家的頭像
         const leaderboardData = await Promise.all(
             Object.entries(snapshot.val())
-                .map(async ([username, data]) => ({ 
-                    username, 
-                    ...data,
-                    avatar: await getUserAvatar(data.uid)
-                }))
+                .map(async ([safeUsername, data]) => { 
+                    // 取得用戶資料以獲取原始用戶名
+                    const userSnapshot = await get(ref(db, `users/${data.uid}`));
+                    const originalUsername = userSnapshot.exists() 
+                        ? userSnapshot.val().originalUsername 
+                        : safeUsername;
+                    
+                    return { 
+                        username: originalUsername, 
+                        ...data,
+                        avatar: await getUserAvatar(data.uid)
+                    };
+                })
         );
         
         // 排序
@@ -95,8 +103,12 @@ export async function fetchUserRank() {
             ? userSnapshot.val().avatarUrl || "./src/img/default-avatar.png"
             : "./src/img/default-avatar.png";
 
+        const originalUsername = userSnapshot.exists() 
+        ? userSnapshot.val().originalUsername 
+        : "未知用戶";
+
         const leaderboardData = Object.entries(snapshot.val())
-            .map(([username, data]) => ({ username, ...data }))
+            .map(([safeUsername, data]) => ({ username: safeUsername, ...data }))
             .sort((a, b) => b.highscore - a.highscore);
 
         const userIndex = leaderboardData.findIndex(player => player.uid === userId);
@@ -108,7 +120,7 @@ export async function fetchUserRank() {
                         <span class="player-rank">${userIndex + 1}</span>
                         <span class="player-info">
                             <img src="${userAvatar}" alt="Your avatar" class="player-avatar">
-                            ${leaderboardData[userIndex].username}
+                            ${originalUsername}
                         </span>
                     </div>
                     <span class="player-score">${leaderboardData[userIndex].highscore} 分</span>

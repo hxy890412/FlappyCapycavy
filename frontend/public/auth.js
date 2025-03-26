@@ -3,8 +3,15 @@ import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } f
 import { ref, get, set, update } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";  // 引入 Firebase Realtime Database
 import { checkUserStatus } from "./main.js"; 
 
+// 安全用戶名函數
+function sanitizeUsername(username) {
+    return username.replace(/[.#$\[\]]/g, '_');
+}
+
 export function register(username, password) {
-    const email = username + "@hamster.com";  // 使用 @hamster.com
+    const safeUsername = sanitizeUsername(username);
+    const email = safeUsername + "@hamster.com";
+
     return createUserWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
             const user = userCredential.user;
@@ -12,7 +19,8 @@ export function register(username, password) {
 
             // 設定用戶基本資料
             return set(userRef, {
-                username: username,
+                originalUsername: username,
+                username: safeUsername,
                 avatarUrl: './src/img/avator_pocky.png',  // 預設頭像
                 highscore: 0,
                 isNewUser: true
@@ -38,7 +46,8 @@ export function register(username, password) {
 
 // 登入功能
 export function login(username, password) {
-    const email = username + "@hamster.com";
+    const safeUsername = username.replace(/[.#$\[\]]/g, '_');
+    const email = safeUsername + "@hamster.com";
     return signInWithEmailAndPassword(auth, email, password);
 }
 
