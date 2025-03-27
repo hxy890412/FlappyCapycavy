@@ -368,10 +368,16 @@ function stopGame() {
  
     gameRunning = false;
 
-    const gameOverElement = document.getElementById("game-over");
+    const gameovermessage = document.getElementById("game-over-message");
+    gameovermessage.style.display = "block";
     const scoreElement = document.getElementById("user-finalscore");
     scoreElement.textContent = score;
-    gameOverElement.style.display = "flex";
+    setTimeout(() => {
+        const gameOverElement = document.getElementById("game-over");
+        gameOverElement.style.display = "flex";
+        gameovermessage.style.display = "none";
+    }, 1000);
+    
 
     const user = auth.currentUser;
 
@@ -405,6 +411,12 @@ function submitScore(username, score) {
         const gameOverElement = document.getElementById("game-over");
         const lightboxContent = gameOverElement.querySelector(".lightbox-content");
 
+         // 首先移除已存在的 "新紀錄" 提示
+         const existingNewRecordMessage = lightboxContent.querySelector(".NewRecord");
+         if (existingNewRecordMessage) {
+             existingNewRecordMessage.remove();
+         }
+
         if (score > existingScore) {
             set(leaderboardRef, {
                 uid: userId,
@@ -425,10 +437,6 @@ function submitScore(username, score) {
             });
         } else {
             console.log('分數未達到新高，未更新');
-            const newRecordMessage = gameOverElement.querySelector(".NewRecord");
-            if (newRecordMessage) {
-                newRecordMessage.remove();
-            }
         }
     }).catch((error) => {
         console.error('取得排行榜分數時發生錯誤：', error);

@@ -67,10 +67,10 @@ export async function fetchLeaderboard() {
                         <span class="player-rank">${index + 1}</span>
                         <span class="player-info">
                             <img src="${player.avatar}" alt="${player.username}'s avatar" class="player-avatar">
-                            ${player.username}
+                            <span class="player_username stroke_text_y color-white">${player.username}</span>
                         </span>
                     </div>
-                    <span class="player-score">${player.highscore} 分</span>
+                    <span class="player-score pixel_box_dark fz-10 color-white">${player.highscore}</span>
                 </div>
             `;
             
@@ -120,17 +120,17 @@ export async function fetchUserRank() {
                         <span class="player-rank">${userIndex + 1}</span>
                         <span class="player-info">
                             <img src="${userAvatar}" alt="Your avatar" class="player-avatar">
-                            ${originalUsername}
+                            <span class="player_username stroke_text_y color-white">${originalUsername}</span>
                         </span>
                     </div>
-                    <span class="player-score">${leaderboardData[userIndex].highscore} 分</span>
+                    <span class="player-score pixel_box_dark fz-10 color-white">${leaderboardData[userIndex].highscore}</span>
                 </div>
             `;
             userRankContainer.innerHTML = userRankHTML;
         } else {
             userRankContainer.innerHTML = `
                 <div class="user-rank-item not-ranked">
-                    <p>你還沒有上榜哦，快來挑戰吧！</p>
+                    <p class="w100 Cubic fz-12">你還沒有上榜哦，快來挑戰吧！</p>
                 </div>
             `;
         }
@@ -140,8 +140,8 @@ export async function fetchUserRank() {
 
 // 監聽 Firebase Auth 狀態變更，確保能抓到當前用戶
 auth.onAuthStateChanged((user) => {
+    fetchLeaderboard();
     if (user) {
-        fetchLeaderboard();
         fetchUserRank();
     }
 });

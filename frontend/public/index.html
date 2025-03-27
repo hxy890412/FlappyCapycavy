@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <title>Flappy Capy & Cavy</title>
+    <title>Flappy CapyCavy</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
@@ -14,23 +14,23 @@
 <body>
     <div class="FlappyCapyCavy_Game">
         <div class="container" id="container-bg">
-            <div id="navbar">
-                <span id="user-status" class="user-status"></span>  <!-- 顯示頭像或帳號 -->
-                <span id="leaderboard-icon"></span>
+            <div id="navbar" class="navbar">
+                <span id="user-status" class="user-status cusor"></span>
+                <span id="leaderboard-icon" class="cursor"></span>
                 <img src="./src/img/pause.png" alt="pasue" id="pause-btn" style="display:none;cursor: pointer;">
             </div>
             <div id="pause-box" style="display: none;">
                 <img src="./src/img/start.png" alt="" id="pause-end-btn" style="cursor: pointer;" >
                 <img src="./src/img/restart.png" alt="" id="restart-btn" style="cursor: pointer;" >
             </div>
-            <span style="display: none;"id="showscore-status"><span id="score-status"></span> </span>  <!-- 顯示分數 -->
+            <span style="display: none;"id="showscore-status"><span id="score-status" class="stroke_text"></span> </span>  <!-- 顯示分數 -->
             <!-- 起始畫面 -->
             <div class="default_page" id="login-out-section">
                 <div class="game_btn_box d-flex gap-24 al-c jc-c flex-col">
-                    <h1 class="fz-18 lh-150 ls-35 stroke_text">Flappy<br>CapyCavy</h1>
+                    <h1 class="fz-18 lh-150 ls-35 stroke_text text-center">Flappy<br>CapyCavy</h1>
                     <!-- 登入後顯示的按鈕 -->
                     <div id="character-selection" class="d-flex gap-24 al-c jc-c flex-col" style="display: none;">
-                        <p id="game-description" class="Cubic fz-16 lh-150">幫助鼠鼠避開障礙物吧！輕觸螢幕即可跳高！加油</p>
+                        <p id="game-description" class="Cubic fz-16 lh-150 text-center">幫助鼠鼠避開障礙物吧！<br>輕觸螢幕即可跳高！加油！</p>
                         <p class="Cubic fz-16 lh-150">請選擇遊玩角色</p>
                         <div class="d-flex gap-24 jc-c">
                             <img src="./src/img/machi_select.png" alt="machi" id="choose-machi">
@@ -52,30 +52,36 @@
             <!-- 遊戲內容畫面 -->
             <div class="game_container" id="game-container">
                 <canvas id="gameCanvas"></canvas>
-                <h3 class="resurrection Cubic fz-20" id="resurrection" style="display: none;">復活中</h3>
+                <h3 class="resurrection Cubic fz-20 stroke_text" id="resurrection" style="display: none;">復活中...</h3>
+                 <!-- gameover訊息 -->
+                <div id="game-over-message" style="display: none;" class="stroke_text fz-18 lh-150 ls-35">GAME OVER</div>
             </div>
             
         </div>
 
     </div>
-    <!-- gameover訊息 -->
-   <div id="game-over-message" style="display: none;">GAME OVER</div>
+   
 
     <!-- 遊戲結束畫面 -->
     <div class="gameover lightbox" id="game-over" style="display: none;">
-        <div class="lightbox-content">
-            <h2>GAME OVER</h2>
-            <p>SCORE：<span id="user-finalscore"></span></p>
-            <p>BEST: <span class="userhighscore"></span></p>
-            <button id="viewleaderboard">RANK</button>
-            <button onclick="restartgame()">RESTART</button>
-            <button onclick="closeGameOverBox()">HOME</button>
+        <div class="lightbox-content pixel_8_lightbox d-flex flex-col gap-24 al-c">
+            <h2 class="stroke_text lh-150 ls-35 fz-18">GAME OVER</h2>
+            <div class="d-flex flex-col gap-8 al-s">
+                <p class="d-flex gap-16"><span class="stroke_text_y fz-16 lh-24">SCORE:</span><span id="user-finalscore" class="fz-16 lh-24 color-db text-right"></span></p>
+                <p class="d-flex gap-16"><span class="stroke_text_y fz-16 lh-24">BEST: </span><span class="userhighscore fz-16 lh-24 color-db text-right"></span></p>
+            </div>
+            <div class="d-flex flex-col al-c gap-16">
+                <button id="viewleaderboard">RANK</button>
+                <button onclick="restartgame()">RESTART</button>
+                <button onclick="closeGameOverBox()">HOME</button>
+            </div>
+            
         </div>
     </div>
     <!-- 排行榜 -->
      <div class="lightbox leaderboard" id="leaderboard-container" style="display: none;">
         <div class="lightbox-content">
-            <button class="close-btn btn_fixed">X</button>
+            <button class="close-btn btn_fixed">BACK</button>
             <div id="10_rank" class="playrank">
             
             </div>
@@ -89,17 +95,20 @@
 
     <!-- 個人資料視窗 -->
     <div id="profile-modal" class="lightbox" style="display: none;">
-        <div class="lightbox-content">
-            <div class="profile-info">
-                <div class="d-flex gap-8 al-c jc-c">
+        <div class="lightbox-content pixel_8_lightbox gap-16 d-flex flex-col al-c">
+            <div class="profile-info pixel_4_lightbox w100">
+                <div class="d-flex gap-8 al-c pd-8">
                     <img id="profile-avatar" src="./src/img/avator_pocky.png" alt="avatar" />
-                    <div class="d-flex flex-col gap-4">
-                        <p id="profile-username">Username: </p>
-                        <p>BEST: <span class="userhighscore"></span></p>
+                    <div class="d-flex flex-col gap-4 al-s">
+                        <p id="profile-username" class="color-white fw-10"></p>
+                        <p class="pixel_box_dark fz-10 color-white">BEST: <span class="userhighscore fz-10 color-y"></span></p>
                     </div>
                 </div>
             </div>
-            <div id="avatar-selection">
+            <div id="avatar-selection" class="pixel_4_lightbox w100">
+                <p class="pixel_4_lightbox Cubic avator_btn cursor">頭像</p>
+                <img src="./src/img/avator_machi.png" alt="avatar1" class="avatar-option" onclick="selectNewAvatar('/src/img/avator_machi.png')" />
+                <img src="./src/img/avator_pocky.png" alt="avatar2" class="avatar-option" onclick="selectNewAvatar('/src/img/avator_pocky.png')" />
                 <img src="./src/img/avator_machi.png" alt="avatar1" class="avatar-option" onclick="selectNewAvatar('/src/img/avator_machi.png')" />
                 <img src="./src/img/avator_pocky.png" alt="avatar2" class="avatar-option" onclick="selectNewAvatar('/src/img/avator_pocky.png')" />
             </div>
