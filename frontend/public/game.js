@@ -46,6 +46,21 @@
 import { auth, db } from './firebase-config.js';
 import { ref, get, set, update } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
+let bgMusic = new Audio();
+bgMusic.src = "./src/music/gamestart.wav"; // 請替換成您的背景音樂檔案
+bgMusic.loop = true;
+bgMusic.volume = 0.1;
+bgMusic.playbackRate = 1.0; // 預設播放速度
+
+let scoreSound = new Audio();
+scoreSound.src = "./src/music/pass.wav"; // 得分音效
+scoreSound.volume = 1;
+
+let jumpSound = new Audio();
+jumpSound.src = "./src/music/jump.wav"; // 跳躍音效
+jumpSound.volume = 0.7;
+
+
 let canvas, ctx;
 let gameInterval;  // 用來儲存遊戲的定時器 ID
 let obstacleInterval; //生成障礙物
@@ -166,6 +181,13 @@ export function startGame() {
      lives = 3; 
      obstacleSpeed = 3;
 
+     bgMusic.pause();
+     bgMusic.currentTime = 0;
+     bgMusic.playbackRate = 1.0;
+     
+     // 播放初始背景音樂
+     bgMusic.play();
+
     // 更新UI
     document.getElementById("score-status").textContent = score;
     document.getElementById("container-bg").style.background = "#E7F3F9";
@@ -185,6 +207,8 @@ export function pauseGame() {
     clearInterval(gameInterval);
     clearInterval(obstacleInterval);
 
+    bgMusic.pause();
+
     // 顯示暫停彈窗
     document.getElementById('pause-box').style.display = 'flex';
 }
@@ -197,6 +221,8 @@ export function resumeGame() {
     gameInterval = setInterval(gameLoop, 1000 / 60);
     obstacleInterval = setInterval(createObstacle, 2000); 
 
+    bgMusic.play();
+    
     document.getElementById('pause-box').style.display = 'none';
 }
 // 全域函數：重新開始遊戲
@@ -223,6 +249,10 @@ export function pauseRestartGame() {
     lives = 3;
     obstacleSpeed = 3;
 
+    bgMusic.pause();
+    bgMusic.currentTime = 0;
+    bgMusic.playbackRate = 1.0;
+    bgMusic.play();
     // 重置角色位置和速度
     gameCharacter.y = 50;
     gameCharacter.velocity = 0;
@@ -294,15 +324,18 @@ function updateGame() {
             obstacle.passed = true; // 標記已經通過
             score += 1;
             document.getElementById("score-status").textContent = score;
+            scoreSound.play();
         }
     });
 
     if (score >= 10) {
         document.getElementById("container-bg").style.background = "#1D2329";
         obstacleSpeed = 5;
+        bgMusic.playbackRate = 1.4;
     } else if (score >= 3) {
         document.getElementById("container-bg").style.background = "linear-gradient(180deg, #EED1AB 0%, #FDB2B2 100%)";
         obstacleSpeed = 4;
+        bgMusic.playbackRate = 1.2;
     }
 
     checkGameOver();
@@ -368,6 +401,8 @@ function stopGame() {
     clearInterval(obstacleInterval);  // 停止障礙物的生成
  
     gameRunning = false;
+    bgMusic.pause();
+
 
     const gameovermessage = document.getElementById("game-over-message");
     gameovermessage.style.display = "block";
@@ -552,6 +587,7 @@ function setupControls() {
 function handleKeyDown(e) {
     if (e.key === " " || e.key === "ArrowUp") {  // 空格或上箭頭鍵
         gameCharacter.velocity = -7; // 跳躍
+        jumpSound.cloneNode(true).play();
     }
 }
 
@@ -559,6 +595,7 @@ function handleKeyDown(e) {
 function handleTouchStart(e) {
     e.preventDefault();
     gameCharacter.velocity = -7; // 跳躍
+    jumpSound.cloneNode(true).play();
 }
 
 // 設置裝置控制方法

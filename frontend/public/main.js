@@ -53,6 +53,31 @@ window.addEventListener("load", () => {
   checkUserStatus();
 });
 
+// 在 main.js 中添加全域點擊音效
+
+// 建立點擊音效物件
+let clickSound = new Audio();
+clickSound.src = "./src/music/pop.wav"; // 請替換成您的點擊音效檔案
+clickSound.volume = 0.6;
+
+// 在文件載入完成後設置全域點擊事件
+document.addEventListener('DOMContentLoaded', function() {
+    // 為整個文件添加點擊事件監聽
+    document.addEventListener('click', function(event) {
+        // 播放點擊音效
+        clickSound.cloneNode(true).play();
+        
+    });
+    
+    // 你也可以排除某些元素不播放點擊音效，例如：
+    // const excludeElements = document.querySelectorAll('.no-click-sound');
+    // excludeElements.forEach(el => {
+    //     el.addEventListener('click', function(e) {
+    //         e.stopPropagation(); // 阻止事件冒泡到 document
+    //     });
+    // });
+});
+
 async function showLeaderboard() {
   document.getElementById("leaderboard-container").style.display = "flex";
 
@@ -138,10 +163,8 @@ export function checkUserStatus() {
 
             if (isNewUser === true) {
               // 顯示提示訊息
-              const hint = document.createElement("div");
-              hint.innerHTML = `<p class="icon_arrow color-db fz-10">點擊選擇頭像</p>`;
-              hint.id = "avatar-hint";
-              userStatusElement.appendChild(hint);
+              const gameGuide = document.getElementById("game-guide");
+              gameGuide.style.display = "flex";
               console.log("hint顯示");
 
               // 設置為非新用戶，下次不再顯示

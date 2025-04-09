@@ -340,6 +340,7 @@ button#cancel-btn{
 .gameover p{
   justify-content: space-between;
   min-width: 130px;
+  width: 100%;
 }
 
 /* profile-modal */
