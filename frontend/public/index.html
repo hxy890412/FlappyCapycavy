@@ -7,6 +7,12 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <!-- 輪播套件 -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.theme.default.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
+
     <link rel="stylesheet" href="./src/style.css">
     <link rel="stylesheet" href="./src/reset.css">
 </head>
@@ -115,11 +121,53 @@
             <button class="close-btn">CLOSE</button>
         </div>
     </div>
+
+    <!-- 使用教學 -->
+    <div class="guide lightbox" id="game-guide" style="display: flex;">
+        <div class="lightbox-content pixel_8_lightbox d-flex flex-col gap-24 al-c">
+            <h2 class="stroke_text lh-150 ls-35 fz-18">GAME GUIDE</h2>
+            <div class="owl_guide_outer">
+                <div class="owl-carousel owl-theme">
+                    <div class="item">
+                        <div class="pixel_8_lightbox">
+                            <img src="./src/img/guide01.png" alt="">
+                        </div>
+                        <p class="Cubic lh-150 fz-10">左上角可查看個人資訊&更改頭像！</p>
+                    </div>
+                    <div class="item">
+                        <div class="pixel_8_lightbox"><img src="./src/img/guide02.png" alt=""></div>
+                        <p class="Cubic lh-150 fz-10">根據分數高低 有不同模式<br>小心有加速唷！</p>
+                    </div>
+                    <!-- 更多步驟... -->
+                </div>
+            </div>
+            <div class="d-flex flex-col al-c gap-16">
+                <button class="close-btn">CLOSE</button>
+            </div>
+            
+        </div>
+    </div>
     <script type="module" src="firebase-config.js"></script>
     <script type="module" src="./auth.js"></script>
     <script type="module" src="./main.js"></script>
     <script type="module" src="./game.js"></script>
     <script type="module" src="./leaderboard.js" defer></script>
+
+    <script>
+        $(document).ready(function(){
+          $('.owl-carousel').owlCarousel({
+            loop: true,
+            margin: 10,
+            nav: true,
+            dots: false,
+            responsive:{
+              0:{
+                  items:1
+              }
+            }
+          });
+        });
+      </script>
     
 </body>
 </html>

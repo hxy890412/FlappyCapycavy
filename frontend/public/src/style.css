@@ -541,3 +541,8 @@ button#cancel-btn{
   width: 100%;
   height: 60px;
 }
+
+/* 使用教學box */
+.owl_guide_outer{
+  width: 80%;
+}

@@ -115,6 +115,7 @@ function initCanvas() {
         chooseCapybara.src = "./src/img/pocky_unselect.png"
         gameCharacter.imageSrc = "./src/img/machi.png";
         gameCharacter.image.src = gameCharacter.imageSrc;
+        gameCharacter.invincibleImage = "./src/img/machi_invincible.png";
         console.log("角色是machi")
     });
 
