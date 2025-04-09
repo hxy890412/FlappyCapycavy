@@ -587,7 +587,7 @@ function setupControls() {
 function handleKeyDown(e) {
     if (e.key === " " || e.key === "ArrowUp") {  // 空格或上箭頭鍵
         gameCharacter.velocity = -7; // 跳躍
-        jumpSound.cloneNode(true).play();
+        // jumpSound.play();
     }
 }
 
@@ -595,7 +595,7 @@ function handleKeyDown(e) {
 function handleTouchStart(e) {
     e.preventDefault();
     gameCharacter.velocity = -7; // 跳躍
-    jumpSound.cloneNode(true).play();
+    // jumpSound.play();
 }
 
 // 設置裝置控制方法

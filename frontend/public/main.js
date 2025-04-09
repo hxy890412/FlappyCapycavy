@@ -60,23 +60,23 @@ let clickSound = new Audio();
 clickSound.src = "./src/music/pop.wav"; // 請替換成您的點擊音效檔案
 clickSound.volume = 0.6;
 
-// 在文件載入完成後設置全域點擊事件
-document.addEventListener('DOMContentLoaded', function() {
-    // 為整個文件添加點擊事件監聽
-    document.addEventListener('click', function(event) {
-        // 播放點擊音效
-        clickSound.cloneNode(true).play();
+// // 在文件載入完成後設置全域點擊事件
+// document.addEventListener('DOMContentLoaded', function() {
+//     // 為整個文件添加點擊事件監聽
+//     document.addEventListener('click', function(event) {
+//         // 播放點擊音效
+//         clickSound.cloneNode(true).play();
         
-    });
+//     });
     
-    // 你也可以排除某些元素不播放點擊音效，例如：
-    // const excludeElements = document.querySelectorAll('.no-click-sound');
-    // excludeElements.forEach(el => {
-    //     el.addEventListener('click', function(e) {
-    //         e.stopPropagation(); // 阻止事件冒泡到 document
-    //     });
-    // });
-});
+//     // 你也可以排除某些元素不播放點擊音效，例如：
+//     // const excludeElements = document.querySelectorAll('.no-click-sound');
+//     // excludeElements.forEach(el => {
+//     //     el.addEventListener('click', function(e) {
+//     //         e.stopPropagation(); // 阻止事件冒泡到 document
+//     //     });
+//     // });
+// });
 
 async function showLeaderboard() {
   document.getElementById("leaderboard-container").style.display = "flex";
