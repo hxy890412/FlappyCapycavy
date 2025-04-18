@@ -56,27 +56,74 @@ window.addEventListener("load", () => {
 // 在 main.js 中添加全域點擊音效
 
 // 建立點擊音效物件
-let clickSound = new Audio();
-clickSound.src = "./src/music/pop.wav"; // 請替換成您的點擊音效檔案
-clickSound.volume = 0.6;
+// let clickSound = new Audio();
+// clickSound.src = "./src/music/pop.wav";
+// clickSound.volume = 0.6;
+const SoundManager = {
+  sounds: {},
+  init: function() {
+      // 預加載音效
+      this.loadSound('click', './src/music/pop.wav', 5);
+  },
+  
+  // 加載音效並創建音效池
+  loadSound: function(id, src, poolSize = 3) {
+      this.sounds[id] = {
+          pool: [],
+          index: 0,
+          lastPlayed: 0
+      };
+      
+      // 創建多個音效實例形成音效池
+      for (let i = 0; i < poolSize; i++) {
+          const audio = new Audio();
+          audio.src = src;
+          audio.load(); // 強制預加載
+          this.sounds[id].pool.push(audio);
+      }
+  },
+  
+  // 播放音效
+  play: function(id, volume = 0.6, minInterval = 50) {
+      if (!this.sounds[id]) return;
+      
+      const now = Date.now();
+      const sound = this.sounds[id];
+      
+      // 防止快速重複觸發 (至少間隔 minInterval 毫秒)
+      if (now - sound.lastPlayed < minInterval) return;
+      
+      // 使用池中的下一個音效實例
+      const audio = sound.pool[sound.index];
+      audio.volume = volume;
+      
+      // 嘗試從頭開始播放
+      audio.currentTime = 0;
+      
+      const playPromise = audio.play();
+      if (playPromise) {
+          playPromise.catch(e => console.log("播放失敗:", e));
+      }
+      
+      // 更新索引和最後播放時間
+      sound.index = (sound.index + 1) % sound.pool.length;
+      sound.lastPlayed = now;
+  }
+};
 
-// // 在文件載入完成後設置全域點擊事件
-// document.addEventListener('DOMContentLoaded', function() {
-//     // 為整個文件添加點擊事件監聽
-//     document.addEventListener('click', function(event) {
-//         // 播放點擊音效
-//         clickSound.cloneNode(true).play();
-        
-//     });
-    
-//     // 你也可以排除某些元素不播放點擊音效，例如：
-//     // const excludeElements = document.querySelectorAll('.no-click-sound');
-//     // excludeElements.forEach(el => {
-//     //     el.addEventListener('click', function(e) {
-//     //         e.stopPropagation(); // 阻止事件冒泡到 document
-//     //     });
-//     // });
-// });
+// 頁面載入時初始化
+document.addEventListener('DOMContentLoaded', function() {
+  // 初始化音效管理器
+  SoundManager.init();
+  
+  // 為所有帶有 sound-btn 類的按鈕添加點擊音效
+  const soundButtons = document.querySelectorAll('.sound-btn');
+  soundButtons.forEach(button => {
+      button.addEventListener('click', function(e) {
+          SoundManager.play('click');
+      });
+  });
+});
 
 async function showLeaderboard() {
   document.getElementById("leaderboard-container").style.display = "flex";

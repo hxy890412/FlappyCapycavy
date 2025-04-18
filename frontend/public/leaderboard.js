@@ -23,7 +23,7 @@ async function getUserAvatar(uid) {
 
 // 獲取前 20 名玩家的排行榜
 export async function fetchLeaderboard() {
-    const leaderboardQuery = query(leaderboardRef, orderByChild("highscore"), limitToFirst(20));
+    const leaderboardQuery = query(leaderboardRef, orderByChild("highscore"));
     const snapshot = await get(leaderboardQuery);
     
     if (snapshot.exists()) {

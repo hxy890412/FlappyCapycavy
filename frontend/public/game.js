@@ -28,7 +28,7 @@
 //                 text-align: center;
 //                 font-family: Arial, sans-serif;
 //             ">
-//                 <img src="./src/img/machi.png" alt="Game Logo" style="width: 150px; margin-bottom: 20px;">
+//                 <img src="./src/img/machi_pixel.svg" alt="Game Logo" style="width: 150px; margin-bottom: 20px;">
 //                 <h1 style="font-size: 24px; margin-bottom: 20px; color: #333;">請使用手機開啟遊戲</h1>
 //                 <p style="font-size: 18px; margin-bottom: 20px; color: #666;">本遊戲僅支援手機版本</p>
 //                 <p style="font-size: 16px; color: #888;">請使用手機瀏覽器開啟</p>
@@ -45,20 +45,6 @@
 // game.js
 import { auth, db } from './firebase-config.js';
 import { ref, get, set, update } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
-
-let bgMusic = new Audio();
-bgMusic.src = "./src/music/gamestart.wav"; // 請替換成您的背景音樂檔案
-bgMusic.loop = true;
-bgMusic.volume = 0.1;
-bgMusic.playbackRate = 1.0; // 預設播放速度
-
-let scoreSound = new Audio();
-scoreSound.src = "./src/music/pass.wav"; // 得分音效
-scoreSound.volume = 1;
-
-let jumpSound = new Audio();
-jumpSound.src = "./src/music/jump.wav"; // 跳躍音效
-jumpSound.volume = 0.7;
 
 
 let canvas, ctx;
@@ -77,12 +63,12 @@ let isResurrecting = false; // 判斷是否復活中（為了設定復活中不�
 let gameCharacter = {
     x: 50,     // 角色的 X 坐標
     y: 100,     // 角色的 Y 坐標
-    width: 50,  // 角色寬度
-    height: 41, // 角色高度
+    width: 75,  // 角色寬度
+    height: 48, // 角色高度
     speed: 3,   // 角色跳躍速度
     velocity: 0, // 角色的垂直速度
     image: new Image(), // 角色圖片對象
-    imageSrc: "./src/img/machi.png", // 預設角色圖片
+    imageSrc: "./src/img/machi_pixel.svg", // 預設角色圖片
     invincibleImage: "./src/img/machi_invincible.png"// 預設角色圖片
 };
 gameCharacter.image.src = gameCharacter.imageSrc;
@@ -102,6 +88,68 @@ let passedObstacles = 0;  // 記錄已通過的水管數量
 // 控制方式變數
 let controlMethod = "keyboard";  // 預設使用鍵盤控制
 
+const AudioManager = {
+    // 音效緩存池
+    soundPools: {},
+    
+    // 初始化音效池
+    initSoundPool: function(soundId, src, poolSize = 5) {
+        this.soundPools[soundId] = {
+            index: 0,
+            sounds: []
+        };
+        
+        // 創建多個音效實例
+        for (let i = 0; i < poolSize; i++) {
+            const sound = new Audio(src);
+            sound.preload = 'auto';
+            this.soundPools[soundId].sounds.push(sound);
+        }
+    },
+    
+    // 播放音效
+    play: function(soundId, volume = 1) {
+        if (!this.soundPools[soundId]) {
+            console.error(`Sound '${soundId}' not initialized`);
+            return;
+        }
+        
+        const pool = this.soundPools[soundId];
+        const sound = pool.sounds[pool.index];
+        
+        // 設置音量
+        sound.volume = volume;
+        
+        // 從頭開始播放
+        sound.currentTime = 0;
+        
+        // 播放音效
+        const playPromise = sound.play();
+        
+        // 處理可能的播放異常
+        if (playPromise !== undefined) {
+            playPromise.catch(error => {
+                console.error(`Error playing sound '${soundId}':`, error);
+            });
+        }
+        
+        // 更新索引到池中的下一個音效
+        pool.index = (pool.index + 1) % pool.sounds.length;
+    }
+};
+// let scoreSound = new Audio();
+// scoreSound.src = "./src/music/pass.wav"; 
+// scoreSound.volume = 1;
+
+// let jumpSound = new Audio();
+// jumpSound.src = "./src/music/jump.wav"; 
+// jumpSound.volume = 0.7;
+
+
+AudioManager.initSoundPool('scoreSound', './src/music/pass.wav', 3);
+AudioManager.initSoundPool('jumpSound', './src/music/jump.wav', 5);
+
+
 // 頁面載入時初始化Canvas
 window.addEventListener("load", initCanvas);
 
@@ -117,7 +165,7 @@ function initCanvas() {
     window.addEventListener("resize", resizeCanvas);
     renderGame();
     // 重置為預設的 Machi 角色
-    gameCharacter.imageSrc = "./src/img/machi.png";
+    gameCharacter.imageSrc = "./src/img/machi_pixel.svg";
     gameCharacter.invincibleImage = "./src/img/machi_invincible.png";
     gameCharacter.image.src = gameCharacter.imageSrc;
     
@@ -128,7 +176,7 @@ function initCanvas() {
     chooseMachi.addEventListener("click", function() {
         chooseMachi.src = "./src/img/machi_select.png"
         chooseCapybara.src = "./src/img/pocky_unselect.png"
-        gameCharacter.imageSrc = "./src/img/machi.png";
+        gameCharacter.imageSrc = "./src/img/machi_pixel.svg";
         gameCharacter.image.src = gameCharacter.imageSrc;
         gameCharacter.invincibleImage = "./src/img/machi_invincible.png";
         console.log("角色是machi")
@@ -143,7 +191,7 @@ function initCanvas() {
         console.log("角色是pocky")
     });
 
-    if(gameCharacter.imageSrc === "./src/img/machi.png"){
+    if(gameCharacter.imageSrc === "./src/img/machi_pixel.svg"){
         gameCharacter.invincibleImage = "./src/img/machi_invincible.png";
     }else{
         gameCharacter.invincibleImage = "./src/img/pocky_invincible.png"
@@ -181,12 +229,6 @@ export function startGame() {
      lives = 3; 
      obstacleSpeed = 3;
 
-     bgMusic.pause();
-     bgMusic.currentTime = 0;
-     bgMusic.playbackRate = 1.0;
-     
-     // 播放初始背景音樂
-     bgMusic.play();
 
     // 更新UI
     document.getElementById("score-status").textContent = score;
@@ -207,7 +249,12 @@ export function pauseGame() {
     clearInterval(gameInterval);
     clearInterval(obstacleInterval);
 
-    bgMusic.pause();
+    Object.keys(AudioManager.soundPools).forEach(soundId => {
+        AudioManager.soundPools[soundId].sounds.forEach(sound => {
+            sound.pause();
+            sound.currentTime = 0;
+        });
+    });
 
     // 顯示暫停彈窗
     document.getElementById('pause-box').style.display = 'flex';
@@ -221,8 +268,6 @@ export function resumeGame() {
     gameInterval = setInterval(gameLoop, 1000 / 60);
     obstacleInterval = setInterval(createObstacle, 2000); 
 
-    bgMusic.play();
-    
     document.getElementById('pause-box').style.display = 'none';
 }
 // 全域函數：重新開始遊戲
@@ -249,10 +294,7 @@ export function pauseRestartGame() {
     lives = 3;
     obstacleSpeed = 3;
 
-    bgMusic.pause();
-    bgMusic.currentTime = 0;
-    bgMusic.playbackRate = 1.0;
-    bgMusic.play();
+    
     // 重置角色位置和速度
     gameCharacter.y = 50;
     gameCharacter.velocity = 0;
@@ -324,18 +366,16 @@ function updateGame() {
             obstacle.passed = true; // 標記已經通過
             score += 1;
             document.getElementById("score-status").textContent = score;
-            scoreSound.play();
+            AudioManager.play('scoreSound', 1);
         }
     });
 
     if (score >= 10) {
         document.getElementById("container-bg").style.background = "#1D2329";
         obstacleSpeed = 5;
-        bgMusic.playbackRate = 1.4;
     } else if (score >= 3) {
         document.getElementById("container-bg").style.background = "linear-gradient(180deg, #EED1AB 0%, #FDB2B2 100%)";
         obstacleSpeed = 4;
-        bgMusic.playbackRate = 1.2;
     }
 
     checkGameOver();
@@ -401,7 +441,6 @@ function stopGame() {
     clearInterval(obstacleInterval);  // 停止障礙物的生成
  
     gameRunning = false;
-    bgMusic.pause();
 
 
     const gameovermessage = document.getElementById("game-over-message");
@@ -566,7 +605,7 @@ function triggerCollision() {
             gameCharacter.image.src = gameCharacter.imageSrc;
             console.log("取消無敵")
         }, 3000);
-    }, 3000);
+    }, 2000);
 }
 
 // 設置遊戲控制
@@ -587,7 +626,7 @@ function setupControls() {
 function handleKeyDown(e) {
     if (e.key === " " || e.key === "ArrowUp") {  // 空格或上箭頭鍵
         gameCharacter.velocity = -7; // 跳躍
-        // jumpSound.play();
+        AudioManager.play('jumpSound', 0.7);
     }
 }
 
@@ -595,7 +634,7 @@ function handleKeyDown(e) {
 function handleTouchStart(e) {
     e.preventDefault();
     gameCharacter.velocity = -7; // 跳躍
-    // jumpSound.play();
+    AudioManager.play('jumpSound', 0.7);
 }
 
 // 設置裝置控制方法
