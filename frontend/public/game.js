@@ -63,15 +63,19 @@ let isResurrecting = false; // 判斷是否復活中（為了設定復活中不�
 let gameCharacter = {
     x: 50,     // 角色的 X 坐標
     y: 100,     // 角色的 Y 坐標
-    width: 75,  // 角色寬度
-    height: 48, // 角色高度
+    width: 50,  // 角色寬度
+    height: 32, // 角色高度
     speed: 3,   // 角色跳躍速度
     velocity: 0, // 角色的垂直速度
     image: new Image(), // 角色圖片對象
     imageSrc: "./src/img/machi_pixel.svg", // 預設角色圖片
-    invincibleImage: "./src/img/machi_invincible.png"// 預設角色圖片
+    invincibleImage: "./src/img/machi_invincible.svg",// 預設角色圖片
+    offsetX: 0,
+    offsetY: 0
 };
 gameCharacter.image.src = gameCharacter.imageSrc;
+
+
 // 載入圖片
 let grassImage = new Image();  // 草地
 grassImage.src = "./src/img/grass.png"; 
@@ -166,8 +170,14 @@ function initCanvas() {
     renderGame();
     // 重置為預設的 Machi 角色
     gameCharacter.imageSrc = "./src/img/machi_pixel.svg";
-    gameCharacter.invincibleImage = "./src/img/machi_invincible.png";
-    gameCharacter.image.src = gameCharacter.imageSrc;
+    gameCharacter.invincibleImage = "./src/img/machi_invincible.svg";
+    // gameCharacter.image.src = gameCharacter.imageSrc;
+    // gameCharacter.width = 50;
+    // gameCharacter.height = 32;
+    // gameCharacter.offsetX = 0;
+    // gameCharacter.offsetY = 0;
+
+    setCharacterImage( gameCharacter.imageSrc, 50, 32, 0, 0);
     
     // 角色選擇邏輯
     const chooseMachi = document.getElementById("choose-machi");
@@ -177,8 +187,11 @@ function initCanvas() {
         chooseMachi.src = "./src/img/machi_select.png"
         chooseCapybara.src = "./src/img/pocky_unselect.png"
         gameCharacter.imageSrc = "./src/img/machi_pixel.svg";
-        gameCharacter.image.src = gameCharacter.imageSrc;
-        gameCharacter.invincibleImage = "./src/img/machi_invincible.png";
+        // gameCharacter.image.src = gameCharacter.imageSrc;
+        gameCharacter.invincibleImage = "./src/img/machi_invincible.svg";
+        // gameCharacter.width = 50;
+        // gameCharacter.height = 32;
+        setCharacterImage(gameCharacter.imageSrc, 50, 32, 0, 0);
         console.log("角色是machi")
     });
 
@@ -186,13 +199,17 @@ function initCanvas() {
         chooseCapybara.src = "./src/img/pocky_select.png"
         chooseMachi.src = "./src/img/machi_unselect.png"
         gameCharacter.imageSrc = "./src/img/pocky.png";
-        gameCharacter.image.src = gameCharacter.imageSrc;
+        // gameCharacter.image.src = gameCharacter.imageSrc;
         gameCharacter.invincibleImage = "./src/img/pocky_invincible.png"
+        // gameCharacter.width = 50;
+        // gameCharacter.height = 32;
+        setCharacterImage(gameCharacter.imageSrc, 50, 32, 0, 0);
+
         console.log("角色是pocky")
     });
 
     if(gameCharacter.imageSrc === "./src/img/machi_pixel.svg"){
-        gameCharacter.invincibleImage = "./src/img/machi_invincible.png";
+        gameCharacter.invincibleImage = "./src/img/machi_invincible.svg";
     }else{
         gameCharacter.invincibleImage = "./src/img/pocky_invincible.png"
     }
@@ -206,6 +223,20 @@ function resizeCanvas() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 }
+
+//設置角色
+function setCharacterImage(src, width, height, offsetX = 0, offsetY = 0) {
+    const img = new Image();
+    img.src = src;
+    img.onload = () => {
+        gameCharacter.image = img;
+        gameCharacter.width = width;
+        gameCharacter.height = height;
+        gameCharacter.offsetX = offsetX;
+        gameCharacter.offsetY = offsetY;
+    };
+}
+
 
 // 設置遊戲開始邏輯
 export function startGame() {
@@ -224,10 +255,15 @@ export function startGame() {
      passedObstacles = 0; 
      gameCharacter.y = 100;  
      gameCharacter.velocity = 0;
-     gameCharacter.image.src = gameCharacter.imageSrc;
+     setCharacterImage(gameCharacter.imageSrc, 50, 32, 0, 0);
+    //  gameCharacter.image.src = gameCharacter.imageSrc;
      obstacles = [];
      lives = 3; 
      obstacleSpeed = 3;
+    //  gameCharacter.width = 50;
+    //  gameCharacter.height = 32;
+    //  gameCharacter.offsetX = 0;
+    //  gameCharacter.offsetY = 0;
 
 
     // 更新UI
@@ -298,7 +334,12 @@ export function pauseRestartGame() {
     // 重置角色位置和速度
     gameCharacter.y = 50;
     gameCharacter.velocity = 0;
-    gameCharacter.image.src = gameCharacter.imageSrc;
+    setCharacterImage(gameCharacter.imageSrc, 50, 32, 0, 0);
+    // gameCharacter.width = 50;
+    // gameCharacter.height = 32;
+    // gameCharacter.offsetX = 0;
+    // gameCharacter.offsetY = 0;
+    // gameCharacter.image.src = gameCharacter.imageSrc;
 
     // 清空障礙物
     obstacles = [];
@@ -420,7 +461,7 @@ function renderGame() {
     ctx.drawImage(grassImage, grassPosition + canvas.width, canvas.height - grassHeight, canvas.width, grassHeight); 
 
     // 繪製角色
-    ctx.drawImage(gameCharacter.image, gameCharacter.x, gameCharacter.y, gameCharacter.width, gameCharacter.height);
+    ctx.drawImage(gameCharacter.image, gameCharacter.x + gameCharacter.offsetX , gameCharacter.y + gameCharacter.offsetY, gameCharacter.width, gameCharacter.height);
     
     // 繪製障礙物
     obstacles.forEach(obstacle => {
@@ -525,6 +566,7 @@ window.restartgame = function () {
     score = 0;
     passedObstacles = 0; // 重設通過的水管數量
     gameCharacter.y = 50;  // 重設角色的Y坐標
+    setCharacterImage(gameCharacter.imageSrc, 50, 32, 0, 0);
     gameCharacter.velocity = 0;
     obstacles = [];
     lives = 3;
@@ -589,7 +631,12 @@ function triggerCollision() {
     document.getElementById('resurrection').style.display = "block";
     isInvincible = true;
     setTimeout(() => {
-        gameCharacter.image.src = gameCharacter.invincibleImage;
+        // gameCharacter.image.src = gameCharacter.invincibleImage;
+        setCharacterImage(gameCharacter.invincibleImage, 60, 60, -5, -14);
+        // gameCharacter.width = 60;
+        // gameCharacter.height = 60;
+        // gameCharacter.offsetX = -5;
+        // gameCharacter.offsetY = -14;
         document.getElementById('resurrection').style.display = "none";
         if(gameCharacter.invincibleImage){
             console.log("無敵狀態切換成功");
@@ -602,7 +649,12 @@ function triggerCollision() {
         // 3秒後結束無敵狀態
         invincibilityTimer = setTimeout(() => {
             isInvincible = false;
-            gameCharacter.image.src = gameCharacter.imageSrc;
+            setCharacterImage(gameCharacter.imageSrc, 50, 32, 0, 0);
+            // gameCharacter.width = 50;
+            // gameCharacter.height = 32;
+            // gameCharacter.offsetX = 0;
+            // gameCharacter.offsetY = 0;
+            // gameCharacter.image.src = gameCharacter.imageSrc;
             console.log("取消無敵")
         }, 3000);
     }, 2000);
