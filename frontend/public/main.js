@@ -1,5 +1,5 @@
 import { logout } from "./auth.js";
-import { startGame, pauseGame, resumeGame, pauseRestartGame } from "./game.js";
+import { startGame, pauseGame, resumeGame, pauseRestartGame } from "./game.js?v=20250425";
 import { auth, db } from "./firebase-config.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 import { ref, get, set, update } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
