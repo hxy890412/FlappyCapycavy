@@ -93,66 +93,86 @@ let passedObstacles = 0;  // 記錄已通過的水管數量
 let controlMethod = "keyboard";  // 預設使用鍵盤控制
 
 const AudioManager = {
-    // 音效緩存池
-    soundPools: {},
+    elements: {},
+    audioContext: null,
+    sounds: {},
     
-    // 初始化音效池
-    initSoundPool: function(soundId, src, poolSize = 5) {
-        this.soundPools[soundId] = {
-            index: 0,
-            sounds: []
-        };
+    init: function() {
+        // 延遲初始化 AudioContext，直到用戶與頁面交互
+        this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
         
-        // 創建多個音效實例
-        for (let i = 0; i < poolSize; i++) {
-            const sound = new Audio(src);
-            sound.preload = 'auto';
-            this.soundPools[soundId].sounds.push(sound);
-        }
+        // 預加載音效，但只創建少量的音頻元素
+        this.preloadSounds();
     },
     
-    // 播放音效
+    preloadSounds: function() {
+        const soundIds = ['jumpSound', 'scoreSound']; // 所有音效的ID
+        
+        soundIds.forEach(id => {
+            // 只創建一個音頻元素，後續可以複製它
+            const audio = document.getElementById(`${id}`);
+            if (audio) {
+                this.sounds[id] = {
+                    buffer: null,
+                    element: audio
+                };
+                
+                // 預先加載但不播放
+                audio.load();
+            }
+        });
+    },
+    
     play: function(soundId, volume = 1) {
-        if (!this.soundPools[soundId]) {
-            console.error(`Sound '${soundId}' not initialized`);
+        if (!this.sounds[soundId]) {
+            console.warn(`找不到音效: ${soundId}`);
             return;
         }
         
-        const pool = this.soundPools[soundId];
-        const sound = pool.sounds[pool.index];
-        
-        // 設置音量
-        sound.volume = volume;
-        
-        // 從頭開始播放
-        sound.currentTime = 0;
-        
-        // 播放音效
-        const playPromise = sound.play();
-        
-        // 處理可能的播放異常
-        if (playPromise !== undefined) {
-            playPromise.catch(error => {
-                console.error(`Error playing sound '${soundId}':`, error);
-            });
+        try {
+            // 使用現有音效元素的克隆，避免創建新的DOM元素
+            const sound = this.sounds[soundId].element.cloneNode(true);
+            sound.volume = volume;
+            sound.play().catch(err => console.warn(`播放音效出錯: ${err.message}`));
+            
+            // 播放完成後自動刪除克隆的元素
+            sound.onended = () => {
+                sound.remove();
+            };
+        } catch (e) {
+            console.warn(`播放音效時出錯: ${e.message}`);
         }
-        
-        // 更新索引到池中的下一個音效
-        pool.index = (pool.index + 1) % pool.sounds.length;
     }
 };
-// let scoreSound = new Audio();
-// scoreSound.src = "./src/music/pass.wav"; 
-// scoreSound.volume = 1;
 
-// let jumpSound = new Audio();
-// jumpSound.src = "./src/music/jump.wav"; 
-// jumpSound.volume = 0.7;
+// 初始化
+document.addEventListener('DOMContentLoaded', AudioManager.init.bind(AudioManager));
 
-
-AudioManager.initSoundPool('scoreSound', './src/music/pass.wav', 3);
-AudioManager.initSoundPool('jumpSound', './src/music/jump.wav', 5);
-
+// 在遊戲開始前預加載所有圖像
+function preloadImages() {
+    const images = {
+        character: gameCharacter.imageSrc,
+        invincible: gameCharacter.invincibleImage,
+        grass: "./src/img/grass.png",
+        carrot: "./src/img/carrot.png",
+        heart: "./src/img/heart.png"
+    };
+    
+    const preloadPromises = [];
+    
+    for (const [key, src] of Object.entries(images)) {
+        const img = new Image();
+        const promise = new Promise((resolve) => {
+            img.onload = resolve;
+            img.onerror = resolve; // 即使加載失敗也繼續
+        });
+        
+        img.src = src;
+        preloadPromises.push(promise);
+    }
+    
+    return Promise.all(preloadPromises);
+}
 
 // 頁面載入時初始化Canvas
 window.addEventListener("load", initCanvas);
@@ -167,15 +187,12 @@ function initCanvas() {
     resizeCanvas();
     // 監聽窗口大小變化
     window.addEventListener("resize", resizeCanvas);
-    renderGame();
+    preloadImages().then(() => {
+        renderGame(); // 預加載完成後渲染遊戲
+    });
     // 重置為預設的 Machi 角色
     gameCharacter.imageSrc = "./src/img/machi_pixel.svg";
     gameCharacter.invincibleImage = "./src/img/machi_invincible.svg";
-    // gameCharacter.image.src = gameCharacter.imageSrc;
-    // gameCharacter.width = 50;
-    // gameCharacter.height = 32;
-    // gameCharacter.offsetX = 0;
-    // gameCharacter.offsetY = 0;
 
     setCharacterImage( gameCharacter.imageSrc, 50, 32, 0, 0);
     
@@ -186,11 +203,10 @@ function initCanvas() {
     chooseMachi.addEventListener("click", function() {
         chooseMachi.src = "./src/img/machi_select.png"
         chooseCapybara.src = "./src/img/pocky_unselect.png"
+
         gameCharacter.imageSrc = "./src/img/machi_pixel.svg";
-        // gameCharacter.image.src = gameCharacter.imageSrc;
         gameCharacter.invincibleImage = "./src/img/machi_invincible.svg";
-        // gameCharacter.width = 50;
-        // gameCharacter.height = 32;
+       
         setCharacterImage(gameCharacter.imageSrc, 50, 32, 0, 0);
         console.log("角色是machi")
     });
@@ -198,11 +214,10 @@ function initCanvas() {
     chooseCapybara.addEventListener("click", function() {
         chooseCapybara.src = "./src/img/pocky_select.png"
         chooseMachi.src = "./src/img/machi_unselect.png"
+
         gameCharacter.imageSrc = "./src/img/pocky.png";
-        // gameCharacter.image.src = gameCharacter.imageSrc;
         gameCharacter.invincibleImage = "./src/img/pocky_invincible.png"
-        // gameCharacter.width = 50;
-        // gameCharacter.height = 32;
+      
         setCharacterImage(gameCharacter.imageSrc, 50, 32, 0, 0);
 
         console.log("角色是pocky")
@@ -248,27 +263,9 @@ export function startGame() {
      if (invincibilityTimer) {
          clearTimeout(invincibilityTimer);
      }
-
-     // 重設遊戲狀態
-     isPaused = false;
-     score = 0;
-     passedObstacles = 0; 
-     gameCharacter.y = 100;  
-     gameCharacter.velocity = 0;
-     setCharacterImage(gameCharacter.imageSrc, 50, 32, 0, 0);
-    //  gameCharacter.image.src = gameCharacter.imageSrc;
-     obstacles = [];
-     lives = 3; 
-     obstacleSpeed = 3;
-    //  gameCharacter.width = 50;
-    //  gameCharacter.height = 32;
-    //  gameCharacter.offsetX = 0;
-    //  gameCharacter.offsetY = 0;
-
-
-    // 更新UI
-    document.getElementById("score-status").textContent = score;
-    document.getElementById("container-bg").style.background = "#E7F3F9";
+    // 重設遊戲狀態
+     resetGameState({ characterY: 100 });
+    
     // 設置遊戲控制
     setupControls();
 
@@ -285,12 +282,17 @@ export function pauseGame() {
     clearInterval(gameInterval);
     clearInterval(obstacleInterval);
 
-    Object.keys(AudioManager.soundPools).forEach(soundId => {
-        AudioManager.soundPools[soundId].sounds.forEach(sound => {
-            sound.pause();
-            sound.currentTime = 0;
-        });
-    });
+    // 暫停所有音效
+    // if (AudioManager.elements) {
+    //     Object.values(AudioManager.elements).forEach(audioArray => {
+    //         audioArray.forEach(audio => {
+    //             if (!audio.paused) {
+    //                 audio.pause();
+    //                 audio.currentTime = 0;
+    //             }
+    //         });
+    //     });
+    // }
 
     // 顯示暫停彈窗
     document.getElementById('pause-box').style.display = 'flex';
@@ -321,33 +323,8 @@ export function pauseRestartGame() {
 
     // 重設所有遊戲狀態
     gameRunning = false;
-    isPaused = false;
-    isInvincible = false;
-
-    // 重置遊戲參數
-    score = 0;
-    passedObstacles = 0;
-    lives = 3;
-    obstacleSpeed = 3;
-
+    resetGameState({ characterY: 50 });
     
-    // 重置角色位置和速度
-    gameCharacter.y = 50;
-    gameCharacter.velocity = 0;
-    setCharacterImage(gameCharacter.imageSrc, 50, 32, 0, 0);
-    // gameCharacter.width = 50;
-    // gameCharacter.height = 32;
-    // gameCharacter.offsetX = 0;
-    // gameCharacter.offsetY = 0;
-    // gameCharacter.image.src = gameCharacter.imageSrc;
-
-    // 清空障礙物
-    obstacles = [];
-
-    // 更新UI
-    document.getElementById("score-status").textContent = score;
-    document.getElementById("container-bg").style.background = "#E7F3F9";
-
     // 隱藏遊戲結束畫面（如果是從遊戲結束畫面重新開始）
     const gameOverElement = document.getElementById("game-over");
     if (gameOverElement) {
@@ -362,9 +339,6 @@ export function pauseRestartGame() {
     // 重新開始遊戲
     startGame();
 }
-
-
-
 
 // 遊戲主循環
 function gameLoop() {
@@ -449,7 +423,6 @@ function createObstacle() {
         passed: false  // 是否已經被通過
     });
 }
-
 
 // 渲染遊戲畫面
 function renderGame() {
@@ -562,17 +535,9 @@ function submitScore(username, score) {
 // 全域函數：重新開始遊戲
 window.restartgame = function () {
     // 重設遊戲狀態
-    isPaused = false;
-    score = 0;
-    passedObstacles = 0; // 重設通過的水管數量
-    gameCharacter.y = 50;  // 重設角色的Y坐標
-    setCharacterImage(gameCharacter.imageSrc, 50, 32, 0, 0);
-    gameCharacter.velocity = 0;
-    obstacles = [];
-    lives = 3;
-    obstacleSpeed = 3;
+    resetGameState({ characterY: 50 });
     document.getElementById("score-status").textContent = score;
-  
+    
     // 隱藏遊戲結束畫面
     const gameOverElement = document.getElementById("game-over");
     gameOverElement.style.display = "none";
@@ -596,7 +561,6 @@ function checkGameOver() {
             gameCharacter.y + gameCharacter.height > canvas.height - obstacle.bottomHeight - grassHeight) && !isInvincible) {
             
             if(lives > 0){
-                // gameCharacter.image.src = gameCharacter.invincibleImage;
                 triggerCollision();
                 console.log(`撞擊！剩餘生命：${lives}`);
                 lives--;
@@ -611,7 +575,6 @@ function checkGameOver() {
        
         if(lives > 0){
             isInvincible = true; // 進入無敵狀態
-            // gameCharacter.image.src = gameCharacter.invincibleImage;
             triggerCollision();
             lives--;
             console.log(`撞擊！剩餘生命：${lives}`);
@@ -631,12 +594,8 @@ function triggerCollision() {
     document.getElementById('resurrection').style.display = "block";
     isInvincible = true;
     setTimeout(() => {
-        // gameCharacter.image.src = gameCharacter.invincibleImage;
         setCharacterImage(gameCharacter.invincibleImage, 60, 60, -5, -14);
-        // gameCharacter.width = 60;
-        // gameCharacter.height = 60;
-        // gameCharacter.offsetX = -5;
-        // gameCharacter.offsetY = -14;
+       
         document.getElementById('resurrection').style.display = "none";
         if(gameCharacter.invincibleImage){
             console.log("無敵狀態切換成功");
@@ -650,15 +609,31 @@ function triggerCollision() {
         invincibilityTimer = setTimeout(() => {
             isInvincible = false;
             setCharacterImage(gameCharacter.imageSrc, 50, 32, 0, 0);
-            // gameCharacter.width = 50;
-            // gameCharacter.height = 32;
-            // gameCharacter.offsetX = 0;
-            // gameCharacter.offsetY = 0;
-            // gameCharacter.image.src = gameCharacter.imageSrc;
             console.log("取消無敵")
         }, 3000);
     }, 2000);
 }
+
+function resetGameState(options = {}){
+    // 重設遊戲狀態
+    isPaused = false;
+    isInvincible = false;
+
+    score = 0;
+    passedObstacles = 0; 
+    lives = 3; 
+    obstacleSpeed = 3;
+
+    gameCharacter.y = options.characterY ?? 50;;  
+    gameCharacter.velocity = 0;
+    setCharacterImage(gameCharacter.imageSrc, 50, 32, 0, 0);
+  
+    obstacles = [];
+    
+    document.getElementById("score-status").textContent = score;
+    document.getElementById("container-bg").style.background = "#E7F3F9";
+}
+
 
 // 設置遊戲控制
 function setupControls() {
@@ -678,7 +653,7 @@ function setupControls() {
 function handleKeyDown(e) {
     if (e.key === " " || e.key === "ArrowUp") {  // 空格或上箭頭鍵
         gameCharacter.velocity = -7; // 跳躍
-        AudioManager.play('jumpSound', 0.7);
+        // AudioManager.play('jumpSound', 1);
     }
 }
 
@@ -686,7 +661,7 @@ function handleKeyDown(e) {
 function handleTouchStart(e) {
     e.preventDefault();
     gameCharacter.velocity = -7; // 跳躍
-    AudioManager.play('jumpSound', 0.7);
+    // AudioManager.play('jumpSound', 1);
 }
 
 // 設置裝置控制方法

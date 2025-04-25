@@ -1,35 +1,8 @@
-/* 通用 */
-@font-face {
-  font-family: Cubic;
-  src:
-  local("Cubic-11"),
-  url(./font/Cubic_11.woff2) format("woff2"),
-  url(./font/Cubic_11.woff) format("woff")
-}
+@font-face{font-family:Cubic;src:local("Cubic-11"),url(font/Cubic_11.woff2) format("woff2"),url(font/Cubic_11.woff) format("woff")}
+:root{--primary-brown:#67554F;--Dark-brown:#433733;--bg-brown:#ECE7E1;--secondary:#FFB700;--red:#E03737;--orange:#FF6422;--bg-y:#FFF4E7}
+*{font-family:"Press Start 2P",system-ui;font-weight:400;font-style:normal;font-size:10px;line-height:16px;color:var(--Dark-brown)}
+.Cubic{font-family:Cubic,system-ui,-apple-system,sans-serif;font-size:16px}
 
-:root{
-  --primary-brown:#67554F;
-  --Dark-brown:#433733;
-  --bg-brown:#ECE7E1;
-  --secondary:#FFB700;
-  --red:#E03737;
-  --orange:#FF6422;
-  --bg-y:#FFF4E7;
-}
-
-/* 文字通用 */
-*{
-  font-family: "Press Start 2P", system-ui; /* 設定字型 */
-  font-weight: 400;
-  font-style: normal;
-  font-size: 10px;
-  line-height: 16px;
-  color: var(--Dark-brown);
-}
-.Cubic{
-  font-family: 'Cubic', system-ui, -apple-system, sans-serif;
-  font-size: 16px;
-}
 .fz-8{font-size: 9;}
 .fz-9{font-size: 9px;}
 .fz-10{font-size: 10px;}
@@ -77,82 +50,23 @@
 .al-c{align-items: center;}
 .al-s{align-items: flex-start;}
 .pd-8{padding: 8px;}
+.mgt-20{margin-top: 20px;}
 .cusor{cursor: pointer;}
 .w100{width: 100%;}
 
 /* 通用元件樣式 */
-.pixel_8_lightbox{
-  box-shadow: -8px 0px 0px var(--primary-brown),
-  8px 0px 0px var(--primary-brown),
-  0px -8px 0px var(--primary-brown),
-  0px 8px 0px var(--primary-brown);
-  border: 5px solid var(--Dark-brown);
-  background: var(--bg-y);
-  margin: 8px;
-}
-.pixel_4_lightbox{
-  box-shadow: -4px 0px 0px var(--Dark-brown),
-  4px 0px 0px var(--Dark-brown),
-  0px -4px 0px var(--Dark-brown),
-  0px 4px 0px var(--Dark-brown);
-  background: var(--primary-brown);
-  margin: 4px;
-}
-.pixel_box_primary{
-  box-shadow: -2px 0px 0px var(--primary-brown),
-  2px 0px 0px var(--primary-brown),
-  0px -2px 0px var(--primary-brown),
-  0px 2px 0px var(--primary-brown);
-  background-color: var(--primary-brown);
-  letter-spacing: 0.12em;
-  padding: 0 8px;
-}
-.pixel_box_dark{
-  box-shadow: -2px 0px 0px var(--Dark-brown),
-  2px 0px 0px var(--Dark-brown),
-  0px -2px 0px var(--Dark-brown),
-  0px 2px 0px var(--Dark-brown);
-  background-color: var(--Dark-brown);
-  letter-spacing: 0.12em;
-  padding: 0 8px;
-}
+.pixel_8_lightbox{box-shadow:-8px 0 0 var(--primary-brown),8px 0 0 var(--primary-brown),0 -8px 0 var(--primary-brown),0 8px 0 var(--primary-brown);border:5px solid var(--Dark-brown);background:var(--bg-y);margin:8px}
+.pixel_4_lightbox{box-shadow:-4px 0 0 var(--Dark-brown),4px 0 0 var(--Dark-brown),0 -4px 0 var(--Dark-brown),0 4px 0 var(--Dark-brown);background:var(--primary-brown);margin:4px}
+.pixel_box_primary{box-shadow:-2px 0 0 var(--primary-brown),2px 0 0 var(--primary-brown),0 -2px 0 var(--primary-brown),0 2px 0 var(--primary-brown);background-color:var(--primary-brown);letter-spacing:.12em;padding:0 8px}
+.pixel_box_dark{box-shadow:-2px 0 0 var(--Dark-brown),2px 0 0 var(--Dark-brown),0 -2px 0 var(--Dark-brown),0 2px 0 var(--Dark-brown);background-color:var(--Dark-brown);letter-spacing:.12em;padding:0 8px}
 
-/* btn */
-button{
-  width: 100%;
-  max-width: 200px;
-  padding: 8px 20px;
-  background: var(--secondary);
-  border: 2px solid #FFFFFF;
-  box-shadow: 0px 4px 4px rgba(103, 85, 79, 0.4), 0px 0px 0px 2px #413531;
-  color: white;
-  -webkit-text-stroke: 4px var(--Dark-brown);
-  paint-order: stroke fill;
-  line-height: 24px;
-  font-size: 14px;
-  letter-spacing: 0.12em;
-  cursor: pointer;
-  margin: 2px;
-}
-button#register-btn{
-  background:var(--primary-brown);
-}
-button#logout-btn{
-  background: var(--red);
-}
-button#viewleaderboard{
-  background: var(--orange);
-}
+button{width:100%;max-width:200px;padding:8px 20px;background:var(--secondary);border:2px solid #fff;box-shadow:0 4px 4px rgba(103,85,79,.4),0 0 0 2px #413531;color:#fff;-webkit-text-stroke:4px var(--Dark-brown);paint-order:stroke fill;line-height:24px;font-size:14px;letter-spacing:.12em;cursor:pointer;margin:2px}
+button#register-btn{background:var(--primary-brown)}
+button#logout-btn{background:var(--red)}
+button#viewleaderboard{background:var(--orange)}
 
 /* 佈局 */
-body {
-  width: 100%;
-  height: 100dvh;
-  overflow: hidden;
-  background-color: #ECE7E1;
-  margin: 0;
-  padding: 0;
-}
+body {width: 100%;height: 100dvh;overflow: hidden;background-color: #ECE7E1;margin: 0;padding: 0;}
 
 .FlappyCapyCavy_Game{
   width: 100%;
@@ -496,22 +410,7 @@ button#cancel-btn{
   max-width: 100%;
   height: 150px;
 }
-.leaderboard .top-three .leaderboard-item:nth-child(1) {
-  order: 2; /* 第一個元素移到中間 */
-}
 
-.leaderboard .top-three .leaderboard-item:nth-child(2) {
-  order: 1; /* 第二個元素移到最左邊 */
-}
-
-.leaderboard .top-three .leaderboard-item:nth-child(3) {
-  order: 3; /* 第三個元素保持在最右邊 */
-}
-.leaderboard .top-three .player-info{
-  flex-direction: column;
-  margin-right: 0;
-}
-.leaderboard .top-three .leaderboard-item .player-rank{display: none;}
 .leaderboard .top-three .leaderboard-item{
   flex-direction: column;
   gap: 10px;
@@ -520,11 +419,30 @@ button#cancel-btn{
   flex: 1;
   margin: 4px;
   width: 100%;
-  max-width: 100%;
+  max-width: calc(33% - 8px);
   height: fit-content;
   border: 3px solid #957F78;
-  overflow: hidden;
+  position: relative;
 }
+.leaderboard .top-three .leaderboard-item:before{
+  content: '';
+  position: absolute;
+  background: url(img/no1.svg) no-repeat center center / 23px 31px;
+  width: 23px;
+  height: 31px;
+  top: -24px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.leaderboard .top-three .leaderboard-item:nth-child(1) {order: 2; /* 第一個元素移到中間 */}
+.leaderboard .top-three .leaderboard-item:nth-child(2){order: 1; /* 第二個元素移到最左邊 */}
+.leaderboard .top-three .leaderboard-item:nth-child(2):before{background: url(img/no2.svg) no-repeat center center / 23px 31px;}
+.leaderboard .top-three .leaderboard-item:nth-child(3) {order: 3; /* 第三個元素保持在最右邊 */}
+.leaderboard .top-three .leaderboard-item:nth-child(3):before{background: url(img/no3.svg) no-repeat center center / 23px 31px;}
+
+.leaderboard .top-three .player-info{flex-direction: column;margin-right: 0;}
+.leaderboard .top-three .leaderboard-item .player-rank{display: none;}
+
 .leaderboard .lightbox-content .playrank .top-three > div:not(:nth-child(1)){
   margin-top: 34px;
 }
@@ -533,8 +451,9 @@ button#cancel-btn{
   height: calc(100dvh - 314px);
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 8px;
   margin-top: 2px;
+  padding-bottom: 12px;
 }
 .leaderboard .lightbox-content .user_rank{
   position: absolute;
@@ -547,3 +466,21 @@ button#cancel-btn{
 .owl_guide_outer{
   width: 80%;
 }
+.owl-carousel .owl-nav button.owl-next, .owl-carousel .owl-nav button.owl-prev, .owl-carousel button.owl-dot,
+.owl-theme .owl-nav [class*=owl-]:hover{
+  background: none;
+  box-shadow: none;
+  width: fit-content;
+}
+.owl-theme .owl-nav{
+  position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, calc(-50% - 15px));
+    display: flex;
+    justify-content: space-between;
+    width: 130%;
+    border: 0;
+    margin-top: 0;
+}
+.owl-carousel .owl-stage-outer{z-index: 2;}
