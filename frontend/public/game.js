@@ -1,45 +1,45 @@
-// document.addEventListener('DOMContentLoaded', function() {
-//     function isMobileDevice() {
-//         return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
-//                window.innerWidth <= 768;
-//     }
+document.addEventListener('DOMContentLoaded', function() {
+    function isMobileDevice() {
+        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
+               window.innerWidth <= 768;
+    }
 
-//     if (!isMobileDevice()) {
-//         document.body.innerHTML = ''; 
-//         document.body.style.margin = '0';
-//         document.body.style.padding = '0';
-//         document.body.style.height = '100vh';
-//         document.body.style.backgroundColor = '#ffffff';
+    if (!isMobileDevice()) {
+        document.body.innerHTML = ''; 
+        document.body.style.margin = '0';
+        document.body.style.padding = '0';
+        document.body.style.height = '100vh';
+        document.body.style.backgroundColor = '#ffffff';
 
-//         const mobileOverlay = document.createElement('div');
-//         mobileOverlay.innerHTML = `
-//             <div style="
-//                 background: #ffdcdc;
-//                 position: fixed;
-//                 top: 0;
-//                 left: 0;
-//                 width: 100%;
-//                 height: 100%;
-//                 display: flex;
-//                 flex-direction: column;
-//                 align-items: center;
-//                 justify-content: center;
-//                 padding: 20px;
-//                 text-align: center;
-//                 font-family: Arial, sans-serif;
-//             ">
-//                 <img src="./src/img/machi_pixel.svg" alt="Game Logo" style="width: 150px; margin-bottom: 20px;">
-//                 <h1 style="font-size: 24px; margin-bottom: 20px; color: #333;">請使用手機開啟遊戲</h1>
-//                 <p style="font-size: 18px; margin-bottom: 20px; color: #666;">本遊戲僅支援手機版本</p>
-//                 <p style="font-size: 16px; color: #888;">請使用手機瀏覽器開啟</p>
-//             </div>
-//         `;
+        const mobileOverlay = document.createElement('div');
+        mobileOverlay.innerHTML = `
+            <div style="
+                background: #ffdcdc;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                padding: 20px;
+                text-align: center;
+                font-family: Arial, sans-serif;
+            ">
+                <img src="./src/img/machi_pixel.svg" alt="Game Logo" style="width: 150px; margin-bottom: 20px;">
+                <h1 style="font-size: 24px; margin-bottom: 20px; color: #333;">請使用手機開啟遊戲</h1>
+                <p style="font-size: 18px; margin-bottom: 20px; color: #666;">本遊戲僅支援手機版本</p>
+                <p style="font-size: 16px; color: #888;">請使用手機瀏覽器開啟</p>
+            </div>
+        `;
 
-//         document.body.appendChild(mobileOverlay);
+        document.body.appendChild(mobileOverlay);
       
-//         return; 
-//     }
-// });
+        return; 
+    }
+});
 
 
 // game.js
