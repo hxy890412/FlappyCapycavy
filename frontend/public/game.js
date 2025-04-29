@@ -201,8 +201,8 @@ function initCanvas() {
     const chooseCapybara = document.getElementById("choose-capybara");
 
     chooseMachi.addEventListener("click", function() {
-        chooseMachi.src = "./src/img/machi_select.png"
-        chooseCapybara.src = "./src/img/pocky_unselect.png"
+        chooseMachi.src = "./src/img/machi_select.svg"
+        chooseCapybara.src = "./src/img/pocky_unselect.svg"
 
         gameCharacter.imageSrc = "./src/img/machi_pixel.svg";
         gameCharacter.invincibleImage = "./src/img/machi_invincible.svg";
@@ -212,11 +212,11 @@ function initCanvas() {
     });
 
     chooseCapybara.addEventListener("click", function() {
-        chooseCapybara.src = "./src/img/pocky_select.png"
-        chooseMachi.src = "./src/img/machi_unselect.png"
+        chooseCapybara.src = "./src/img/pocky_select.svg"
+        chooseMachi.src = "./src/img/machi_unselect.svg"
 
-        gameCharacter.imageSrc = "./src/img/pocky.png";
-        gameCharacter.invincibleImage = "./src/img/pocky_invincible.png"
+        gameCharacter.imageSrc = "./src/img/pocky_pixel.svg";
+        gameCharacter.invincibleImage = "./src/img/pocky_invincible.svg"
       
         setCharacterImage(gameCharacter.imageSrc, 50, 32, 0, 0);
 
